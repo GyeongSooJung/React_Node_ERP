@@ -21,8 +21,9 @@ import { useHistory } from "react-router-dom";
 //dispatch
 import Axios from 'axios'
 
-import {useDispatch} from 'react-redux';
+  // 회원가입
 import {signupCompany} from '../../../_actions/user_action';
+import {useDispatch} from 'react-redux';
 
 function Copyright() {
   return (
@@ -135,17 +136,22 @@ export default function Checkout() {
   
   const history = useHistory();
   
-  // 회원가입
   const dispatch = useDispatch();
   
   const signup = () => {
         
-    const request = Axios.post('/users',user)
-        .then(response => {
-            console.log(response);
-        })
+      dispatch(signupCompany(user))
+      .then(response => {
+        if(response.payload.result == true) {
+          alert("회원가입이 완료되었습니다! 로그인을 해주세요")
+          history.push('/signin')
+        }
         
-    
+        else {
+          alert("회원가입에 실패하였습니다 다시시도해주세요")
+        }
+      })
+        
   }
   
 
@@ -174,9 +180,7 @@ export default function Checkout() {
           <React.Fragment>
             {activeStep === steps.length ? (
             <div>
-                {alert("회원가입이 완료되었습니다! 로그인을 해주세요")}
                 {signup()}
-                {history.push('/')}
             </div>
                 
             ) : (

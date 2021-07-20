@@ -14,6 +14,9 @@ import {cnuCheck} from '../../../_actions/user_action';
 //주소 검색
 import DaumPostCode from 'react-daum-postcode';
 
+//쿠키 사용
+import { useCookies } from "react-cookie";
+
 const useStyles = makeStyles((theme) => ({
   paper: {
     marginTop: theme.spacing(8),
@@ -43,6 +46,10 @@ export default function CompanytForm(props) {
   
   let [user, setUserState] = useState(userbody);
   let [CNUcheck, setCNUcheck] = useState(userbody.CNUcheck);
+  
+  //쿠키 제거하기위한 함수
+  const [cookies, setCookie, removeCookie] = useCookies(['hashAuth']);
+  removeCookie('hashAuth')
   
   // 주소 확인 여부
   let [AddressOn, setAddressOn] = useState(false);

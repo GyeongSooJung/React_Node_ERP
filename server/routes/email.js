@@ -26,7 +26,8 @@ const smtpTransport = nodemailer.createTransport({
 router.post('/send', async (req, res, next) => {
   const reademailaddress = req.body.EEM;
   
-  const exEA = await modelQuery(QUERY.Find,COLLECTION_NAME.Company,{ "EA" : reademailaddress },{});
+  const exEA = await modelQuery(QUERY.Find,COLLECTION_NAME.Employee,{ "EEM" : reademailaddress },{});
+  console.log(exEA)
   try {
     // 이메일이 중복됐을 때
     if(exEA.length != 0) {
@@ -36,7 +37,6 @@ router.post('/send', async (req, res, next) => {
       let authNum = Math.random().toString().substr(2,6);
       console.log(authNum);
       const hashAuth = await bcrypt.hash(authNum, 12);
-      console.log(req.cookies)
       const mailOptions = {
         from: "mk.manager2020@gmail.com",
         to: reademailaddress,
@@ -83,7 +83,6 @@ router.post('/send', async (req, res, next) => {
 router.post('/cert', async (req, res, next) => {
   const CEA = req.body.CEA;
   const CEA2 = req.body.CEA2;
-  console.log(CEA,CEA2,bcrypt.compareSync(CEA, CEA2))
   
   try {
     if(bcrypt.compareSync(CEA, CEA2)) {

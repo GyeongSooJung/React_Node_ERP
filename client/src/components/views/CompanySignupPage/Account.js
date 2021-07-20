@@ -72,7 +72,6 @@ export default function AccountForm(props) {
   }
   
   const onIDcheckHandler = (event) => {
-    // console.log(user.EID)
     dispatch(idDupleCheck(user))
         .then(response => {
             if(response.payload.result) {

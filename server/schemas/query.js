@@ -86,7 +86,6 @@ exports.modelQuery = async (query,collection,doc,option) => {
     }
     
     else if ( query == QUERY.Create) {
-        
         switch (collection) {
             case COLLECTION_NAME.Company : 
                 break;
@@ -103,7 +102,12 @@ exports.modelQuery = async (query,collection,doc,option) => {
         }
         
         else {
+            try {
             one = await Collection.create(doc).then(resResult);
+            }
+            catch(err) {
+                console.log(err)
+            }
         }
         
         return one;

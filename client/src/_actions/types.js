@@ -4,3 +4,4 @@ export const ID_CHECK = "id_check";
 export const CNU_CHECK = "cnu_check";
 export const EMAIL_SEND = "email_send";
 export const EMAIL_CERT = "email_cert";
+export const SIGNIN_USER = "signin_user"

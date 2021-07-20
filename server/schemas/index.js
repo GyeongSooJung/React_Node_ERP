@@ -1,10 +1,14 @@
 require('dotenv').config();
 const mongoose = require('mongoose');
 
-const config = require('../config/key')
+const config = require('../config/key');
+console.log(config.mongoURI);
 
 const connect = () => {
+<<<<<<< HEAD
     
+=======
+>>>>>>> f5c2ef8c2c12766e0578731d3dbdb7c985550229
     if (process.env.NODE_ENV !== 'production') {
         mongoose.set('debug', true);
     }
@@ -19,8 +23,8 @@ const connect = () => {
         else {
             console.log('DB Connect is SuccessFul!');
         }
-    }).then(()=>console.log('MongoDB Connected...'))
-      .catch(err=>console.log(err));
+    }).then(() => console.log("몽고연결"))
+        .catch(err => console.log(err));
 };
 mongoose.connection.on('error', (error) => {
     console.error('DB Error', error);
