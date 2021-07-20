@@ -4,12 +4,14 @@ const mongoose = require('mongoose');
 const config = require('../config/key')
 
 const connect = () => {
-    // const mongoCon = 'mongodb://test:test1234@18.140.74.102:9003/admin';
     
     if (process.env.NODE_ENV !== 'production') {
         mongoose.set('debug', true);
     }
-    mongoose.connect(config.mongoURI, {dbName: 'ERP'}, {
+    mongoose.connect(config.mongoURI, {
+        useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true, useFindAndModify: false,
+        dbName: 'ERP'
+    }, {
     }, (error) => {
         if (error) {
             console.log('DB Connection is Error', error);
