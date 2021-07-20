@@ -2,12 +2,17 @@ import {
     LOGIN_USER,
     SIGNUP_COMPANY,
     ID_CHECK,
-    CNU_CHECK
+    CNU_CHECK,
+    EMAIL_SEND,
+    SIGNIN_USER
 } from '../_actions/types';
 
 export default function (state = {}, action) {
     switch (action.type) {
         case LOGIN_USER :
+            return { ...state, data : action.payload }
+            break;
+        case SIGNIN_USER :
             return { ...state, data : action.payload }
             break;
         case SIGNUP_COMPANY :

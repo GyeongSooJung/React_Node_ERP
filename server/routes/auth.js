@@ -11,12 +11,37 @@ const request = require('request');
 const {modelQuery} = require('../schemas/query')
 const {COLLECTION_NAME, QUERY} = require('../const/consts');
 
+router.post('/signin', async (req, res, next) => {
+  
+  const { CNU, EID, EPW } = req.body;
+  
+  const employeeone = await modelQuery(QUERY.Findone,COLLECTION_NAME.Employee, {
+    CNU : CNU,
+    EID : EID
+  },{})
+  console.log(employeeone)
+  
+  
+  console.log(employeeone.EPW)
+  console.log(typeof(employeeone.EPW))
+  
+  console.log(EPW)
+  console.log(typeof(EPW))
+  
+  
+  console.log(bcrypt.compareSync(EPW,employeeone.EPW))
+  
+  
+  
+  
+})
+
 router.post('/signup', async (req, res, next) => {
-    
+  try {
     await modelQuery(QUERY.Create,COLLECTION_NAME.Company,{
       CNA : req.body.CNA,
       CNU : req.body.CNU,
-      CAD : req.body.CAD,
+      CAD : req.body.CAD + " " +req.body.CAD2,
       CEON : req.body.CEON,
       CEOP : req.body.CEOP,
       CTEL : req.body.CTEL,
@@ -24,13 +49,27 @@ router.post('/signup', async (req, res, next) => {
       CEM : req.body.CEM
     },{})
     
-    // await modelQuery(QUERY.Create,COLLECTION_NAME.Employee,{
-    //   EID : req.body.CID,
-    //   EPW : req.body.EPW,
-    //   ENA : req.body.CEON,
-    // },{})
+    const EPW = req.body.EPW;
+    const hashAuth = await bcrypt.hash(EPW, 12);
+    
+    await modelQuery(QUERY.Create,COLLECTION_NAME.Employee,{
+      EID : req.body.EID,
+      EPW : hashAuth,
+      ENA : req.body.ENA,
+      EAD : req.body.EAD + " " +req.body.EAD2,
+      EPH : req.body.EPH,
+      EEM : req.body.EEM,
+      EAU : "mk",
+      CNU : req.body.CNU
+    },{})
     
     res.send({result : true});
+  }
+  catch(err) {
+    res.send({result : false});
+  }
+    
+    
 })
 
 router.post('/idcheck', async (req, res, next) => {

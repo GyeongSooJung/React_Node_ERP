@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect  } from 'react';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -12,6 +12,10 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
+
+//리덕스
+import {useDispatch} from 'react-redux';
+import {signinUser} from '../../../_actions/user_action';
 
 function Copyright() {
   return (
@@ -48,6 +52,31 @@ const useStyles = makeStyles((theme) => ({
 
 export default function SignIn() {
   const classes = useStyles();
+  const dispatch = useDispatch();
+  
+  let loginbody = {
+    CNU : "",
+    EID : "",
+    EPW : "",
+  }
+  
+  let [loginUser, setLoginUser] = useState(loginbody);
+  
+  let { CNU, EID, EPW} = loginUser; 
+  
+  const onDataHandler = (event) => {
+    setLoginUser({...loginUser, [event.target.name] : event.target.value})
+  }
+  
+  const onLoginHandler = (event) => {
+    event.preventDefault();
+    
+    dispatch(signinUser(loginUser))
+    .then(response => {
+      console.log(response)
+    })
+    
+  }
 
   return (
     <Container component="main" maxWidth="xs">
@@ -59,32 +88,45 @@ export default function SignIn() {
         <Typography component="h1" variant="h5">
           Sign in
         </Typography>
-        <form className={classes.form} noValidate>
-          <TextField
+        <form className={classes.form} onSubmit = {onLoginHandler} >
+        <TextField
             variant="outlined"
             margin="normal"
             required
             fullWidth
-            id="email"
-            label="Email Address"
-            name="email"
-            autoComplete="email"
+            id="CNU"
+            label="사업자 등록번호"
+            name="CNU"
+            autoComplete="CNU"
             autoFocus
+            value={CNU}
+            onChange={onDataHandler}
           />
           <TextField
             variant="outlined"
             margin="normal"
             required
             fullWidth
-            name="password"
-            label="Password"
-            type="password"
-            id="password"
-            autoComplete="current-password"
+            id="EID"
+            label="아이디"
+            name="EID"
+            autoComplete="EID"
+            autoFocus
+            value={EID}
+            onChange={onDataHandler}
           />
-          <FormControlLabel
-            control={<Checkbox value="remember" color="primary" />}
-            label="Remember me"
+          <TextField
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            name="EPW"
+            label="비밀번호"
+            type="password"
+            id="EPW"
+            autoComplete="current-password"
+            value={EPW}
+            onChange={onDataHandler}
           />
           <Button
             type="submit"

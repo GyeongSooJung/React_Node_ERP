@@ -12,37 +12,29 @@ const COMPANY = {
     schema : {
         //Company Name
         CNA : {
-            type : String,
-            required : true
+            type : String
         },//Company Number
         CNU : {
             type : String,
-            required : true,
             unique : true
         },//Company Address
         CAD : {
             type : String,
-            required : true,
         },//CEO name
         CEON : {
             type : String,
-            required : true,
         },//CEO Phone
         CEOP : {
             type : String,
-            required : true,
         },//Company tel
         CTEL : {
             type : String,
-            required : true,
         },//Company fax
         CFAX : {
             type : String,
-            required : true,
         },//Company email
         CEM : {
             type : String,
-            required : true,
         },//Comapny Create at
         CCA : {
             type : Date,

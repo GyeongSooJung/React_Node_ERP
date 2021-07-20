@@ -13,6 +13,7 @@ import Button from '@material-ui/core/Button';
 //리덕스
 import {useDispatch} from 'react-redux';
 import {emailSend, emailCert} from '../../../_actions/email_action';
+import {signupCompany} from '../../../_actions/user_action';
 
 //주소 검색
 import DaumPostCode from 'react-daum-postcode';
@@ -47,16 +48,20 @@ export default function Review(props) {
   const classes = useStyles();
   const dispatch = useDispatch();
   
-  const [cookies, setCookie, removeCookie] = useCookies(['rememberText']);
+  const [cookies, setCookie, removeCookie] = useCookies(['hashAuth']);
+  
   
   let userbody = props.formParent.user;
   let activeStep = props.formParent.activeStep;
   
   let [user, setUserState] = useState(userbody);
-  let [emailcertCheck, setEmailcertCheck] = useState("");
+  let [emailcertCheck, setEmailCertCheck] = useState("");
   let [emailsendCheck, setEmailSendCheck] = useState(false);
   let [minutes, setMinutes] = useState(parseInt(0));
   let [seconds, setSeconds] = useState(parseInt(0));
+  
+  let [authCookie, setAuthCookie] = useState("");
+  let [Cookiebool, setCookieBool] = useState(true);
   
     // 주소 확인 여부
   let [AddressOn, setAddressOn] = useState(false);
@@ -100,28 +105,68 @@ export default function Review(props) {
   const Addresspop = () => {
     setAddressOn(true);
   }
-  const emailsendHandler = () => {
+  const emailsendHandler = async () => {
     dispatch(emailSend(user))
     .then(response => {
+      console.log(response.payload.result)
+      if(response.payload.result == 'send') {
         setEmailSendCheck(true);
         setMinutes(5);
         setSeconds(0);
-        setCookie('hashAuth',response.payload.hashAuth,{path: '/', expires: new Date(Date.now()+300000)})
-        console.log(response.payload);
-        console.log(cookies)
+        const hashAuth = response.payload.hashAuth;
+        setCookie('hashAuth',hashAuth,{path: '/', expires: new Date(Date.now()+300000)});
+        
+        setAuthCookie(hashAuth);
+      }
+      else if(response.payload.result == 'exist') {
+        alert('중복된 이메일이 존재합니다.')
+      }
+      else {
+        alert('다시 확인해주세요.')
+      }
+        
       });
   }
   
   const emailcertHandler = (event) => {
-    console.log(cookies.hashAuth)
-    dispatch(emailCert({CEA : authNum, CEA2 : cookies.hashAuth}))
+    dispatch(emailCert({CEA : authNum, CEA2 : authCookie}))
     .then(response => {
-    console.log(response.payload.result)
-    removeCookie('hashAuth');
-      }) 
+        if(response.payload.result == 'success') {
+          setEmailCertCheck(true);
+          setCookieBool(false);
+          alert('확인됐습니다.');
+          removeCookie('hashAuth');
+        } 
+        else {
+          alert('다시 확인해주세요.');
+        }
+      })
   }
   
+  const onSignupHandler = (event) => {
+    event.preventDefault();
+    if(!emailcertCheck) {
+      alert('이메일 인증을 받아주세요.');
+    }
+    else {
+      console.log(user)
+      // alert('회원가입이 완료되었습니다. 로그인해주세요');
+      // const data = { user : user, activeStep : activeStep + 1 };
+      // props.onChange(data);
+      
+      const data = { user : user, activeStep : activeStep + 1 };
+      props.onChange(data);
+    }
+  }
   
+  useEffect(() => {
+    if(cookies.hashAuth !== undefined){
+      setCookieBool(true)
+    }
+    else {
+      setCookieBool(false)
+    }
+  },[]);
   
   useEffect(() => {
   const countdown = setInterval(() => {
@@ -146,7 +191,7 @@ export default function Review(props) {
         개인 정보
       </Typography>
       
-      <form className={classes.form} onSubmit={onNextHandler}>
+      <form className={classes.form} onSubmit={onSignupHandler}>
         <Grid container spacing={2}>
           <Grid item xs={12}>
             <TextField
@@ -265,7 +310,7 @@ export default function Review(props) {
                 required
                 fullWidth
                 name="authNum"
-                label="상세 주소"
+                label="인증 번호"
                 type="text"
                 id="authNum"
                 value={authNum}
@@ -279,6 +324,7 @@ export default function Review(props) {
                   fullWidth
                   size='large'
                   onClick={emailcertHandler}
+                  disabled = {Cookiebool}
                   >
                   인증
                 </Button>

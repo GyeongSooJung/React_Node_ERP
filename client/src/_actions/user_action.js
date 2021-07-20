@@ -4,7 +4,8 @@ import {
     SIGNUP_COMPANY,
     ID_CHECK,
     CNU_CHECK,
-    EMAIL_SEND
+    EMAIL_SEND,
+    SIGNIN_USER
 } from './types';
 
 export function loginUser(dataToSubmit) {
@@ -12,10 +13,20 @@ export function loginUser(dataToSubmit) {
     .then(response =>  response.data);
     
     return {
-        type : LOGIN_USER,
+        type : SIGNIN_USER,
         payload: request
     }
 } 
+
+export function signinUser(dataTosubmit) {
+    const request = Axios.post('/auth/signin',dataTosubmit)
+    .then(response =>  response.data);
+    
+    return {
+        type : SIGNIN_USER,
+        payload: request
+    }
+}
 
 export function signupCompany(dataToSubmit) {
     const request = Axios.post('/auth/signup',dataToSubmit)

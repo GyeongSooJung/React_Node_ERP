@@ -6,40 +6,34 @@ const EMPLOYEE = {
     EPH : "EPH",
     EEM : "EEM",
     EAU : "EAU",
-    CID : "CID",
+    CNU : "CNU",
     ECA : "ECA",
     EUA : "EUA",
     schema  : {
         //Employee ID
         EID : {
             type : String,
-            required : true
         },//Employee PW
         EPW : {
             type : String,
-            required : true
         },//Employee Name
         ENA : {
             type : String,
-            required : true
         },//Employee Address
         EAD : {
             type : String,
-            required : true
         },//Employee Phone
         EPH : {
             type : String,
-            required : true,
         },//Employee Email
         EEM : {
             type : String,
-            required : true,
         },//Employee Authority
         EAU : {
             type : String,
         },
-        //Company ID
-        CID : {
+        //Company Number
+        CNU : {
             type : String,
         },//Employee Create at
         ECA : {

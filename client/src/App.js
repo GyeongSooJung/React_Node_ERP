@@ -18,8 +18,8 @@ import {
 // 네브바는 useEffect를 사용한 ajax
 // 랜딩페이지는 fetch를 사용한 ajax
 
-import SigninPage from './components/views/SigninPage';
-import SignupConfirm from './components/views/SignupConfirm';
+import SigninPage from './components/views/SigninPage/SigninPage';
+import SignupConfirm from './components/views/CompanySignupPage/SignupConfirm';
 import SignupPage from './components/views/CompanySignupPage/Checkout';
 import SignupAddress from './components/views/CompanySignupPage/Address';
 
@@ -36,6 +36,7 @@ export default function BasicExample() {
         */}
         <Switch>
           <Route exact path="/" component={SigninPage} />
+          <Route exact path="/signin" component={SigninPage} />
           <Route exact path="/signup" component={SignupPage} />
           <Route exact path="/signupconfirm" component={SignupConfirm} />
           <Route exact path="/address" component={SignupAddress} />
