@@ -1,0 +1,1 @@
+tail -n 10 -f /home/ubuntu/.forever/erp.log&
