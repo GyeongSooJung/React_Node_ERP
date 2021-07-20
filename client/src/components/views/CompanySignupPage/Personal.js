@@ -108,7 +108,6 @@ export default function Review(props) {
   const emailsendHandler = async () => {
     dispatch(emailSend(user))
     .then(response => {
-      console.log(response.payload.result)
       if(response.payload.result == 'send') {
         setEmailSendCheck(true);
         setMinutes(5);
