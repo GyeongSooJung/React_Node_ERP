@@ -14,26 +14,18 @@ const {COLLECTION_NAME, QUERY} = require('../const/consts');
 router.post('/signin', async (req, res, next) => {
   
   const { CNU, EID, EPW } = req.body;
-  
-  const employeeone = await modelQuery(QUERY.Findone,COLLECTION_NAME.Employee, {
+  const employeeone = await modelQuery(QUERY.Find,COLLECTION_NAME.Employee, {
     CNU : CNU,
     EID : EID
   },{})
-  console.log(employeeone)
   
   
-  console.log(employeeone.EPW)
-  console.log(typeof(employeeone.EPW))
-  
-  console.log(EPW)
-  console.log(typeof(EPW))
-  
-  
-  console.log(bcrypt.compareSync(EPW,employeeone.EPW))
-  
-  
-  
-  
+  if ( bcrypt.compareSync(EPW,employeeone[0].EPW) ) {
+    res.send({result : true, isLogined : employeeone[0]});
+  }
+  else {
+    res.send({result : false});
+  }
 })
 
 router.post('/signup', async (req, res, next) => {
