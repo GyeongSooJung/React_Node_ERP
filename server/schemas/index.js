@@ -5,10 +5,6 @@ const config = require('../config/key');
 console.log(config.mongoURI);
 
 const connect = () => {
-<<<<<<< HEAD
-    
-=======
->>>>>>> f5c2ef8c2c12766e0578731d3dbdb7c985550229
     if (process.env.NODE_ENV !== 'production') {
         mongoose.set('debug', true);
     }

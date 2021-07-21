@@ -1,57 +1,14 @@
-import React, { useState, useEffect  } from 'react';
+// react, material-ui import
+import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import Paper from '@material-ui/core/Paper';
-import Stepper from '@material-ui/core/Stepper';
-import Step from '@material-ui/core/Step';
-import StepLabel from '@material-ui/core/StepLabel';
-import Button from '@material-ui/core/Button';
-import Link from '@material-ui/core/Link';
-import Typography from '@material-ui/core/Typography';
-import Alert from '@material-ui/lab/Alert';
-
+import { CssBaseline, Grid, Container, Stepper, Step, StepLabel, Typography, Link, Button, Divider } from '@material-ui/core';
+// 파일 import
 import Account from './Account';
 import Company from './Company';
 import Personal from './Personal';
 
-import { useHistory } from "react-router-dom";
-
-//dispatch
-import Axios from 'axios'
-
-  // 회원가입
-import {signupCompany} from '../../../_actions/user_action';
-import {useDispatch} from 'react-redux';
-
-function Copyright() {
-  return (
-    <Typography variant="body2" color="textSecondary" align="center">
-      {'Copyright © '}
-      <Link color="inherit" href="https://material-ui.com/">
-        Your Website
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
-
+// Mateiral UI 수정
 const useStyles = makeStyles((theme) => ({
-  appBar: {
-    position: 'relative',
-  },
-  layout: {
-    width: 'auto',
-    marginLeft: theme.spacing(2),
-    marginRight: theme.spacing(2),
-    [theme.breakpoints.up(600 + theme.spacing(2) * 2)]: {
-      width: 600,
-      marginLeft: 'auto',
-      marginRight: 'auto',
-    },
-  },
   paper: {
     marginTop: theme.spacing(3),
     marginBottom: theme.spacing(3),
@@ -61,6 +18,30 @@ const useStyles = makeStyles((theme) => ({
       marginBottom: theme.spacing(6),
       padding: theme.spacing(3),
     },
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  form: {
+    width: '100%', // Fix IE 11 issue.
+    marginTop: theme.spacing(1),
+  },
+  submit: {
+    margin: theme.spacing(3, 0, 2),
+    padding: theme.spacing(1.5, 0, 1.5),
+    backgroundColor: '#d32f2f',
+    color: 'white',
+    
+    '&:hover': {
+        backgroundColor: '#b52626',
+        color: '#f5f5f5'
+    }
+  },
+  logo: {
+    margin: theme.spacing(1),
+    display: 'flex',
+    justifyContent: 'center',
   },
   stepper: {
     padding: theme.spacing(3, 0, 5),
@@ -73,6 +54,31 @@ const useStyles = makeStyles((theme) => ({
     marginTop: theme.spacing(3),
     marginLeft: theme.spacing(1),
   },
+  colorButton: {
+    marginTop: theme.spacing(3),
+    marginLeft: theme.spacing(1),
+    backgroundColor: '#d32f2f',
+    color: 'white',
+    
+    '&:hover': {
+        backgroundColor: '#b52626',
+        color: '#f5f5f5'
+    }
+  },
+  hr: {
+    margin: theme.spacing(3, 0, 3)
+  },
+  // stepIcon color
+  stepIcon: {
+    '&$completed': {
+        color: "#d32f2f"
+    },
+    '&$active': {
+        color: "#d32f2f"
+    },
+  },
+  completed: {},
+  active: {}
 }));
 
 
@@ -98,10 +104,11 @@ export default function Checkout() {
           setActiveStep(value.activeStep);
         }}/>;
       case 2:
-        return <Personal formParent={{user : user, activeStep : activeStep}} 
+        return <Personal formParent={{user : user, activeStep : activeStep, signupResult : signupResult}} 
         onChange={value => {
           setUser(value.user);
           setActiveStep(value.activeStep);
+          setSignupResult(value.signupResult);
         }}/>;
       default:
         throw new Error('Unknown step');
@@ -131,69 +138,72 @@ export default function Checkout() {
       authNum : "",
   }
 
-  let [user, setUser] = useState(userbody)
-  let [activeStep, setActiveStep] = useState(0)
-  
-  const history = useHistory();
-  
-  const dispatch = useDispatch();
-  
-  const signup = () => {
-        
-      dispatch(signupCompany(user))
-      .then(response => {
-        if(response.payload.result == true) {
-          alert("회원가입이 완료되었습니다! 로그인을 해주세요")
-          history.push('/signin')
-        }
-        
-        else {
-          alert("회원가입에 실패하였습니다 다시시도해주세요")
-        }
-      })
-        
-  }
+  const [user, setUser] = useState(userbody);
+  const [activeStep, setActiveStep] = useState(0);
+  const [signupResult, setSignupResult] = useState(false);
   
 
   return (
     <React.Fragment>
+      <Container component="main" maxWidth="sm">
       <CssBaseline />
-      <AppBar position="absolute" color="default" className={classes.appBar}>
-        <Toolbar>
-          <Typography variant="h6" color="inherit" noWrap>
-            MK
-          </Typography>
-        </Toolbar>
-      </AppBar>
-      <main className={classes.layout}>
-        <Paper className={classes.paper}>
-          <Typography component="h1" variant="h4" align="center">
-            Sign up
-          </Typography>
-          <Stepper activeStep={activeStep} className={classes.stepper}>
-            {steps.map((label) => (
-              <Step key={label}>
-                <StepLabel>{label}</StepLabel>
-              </Step>
-            ))}
-          </Stepper>
-          <React.Fragment>
-            {activeStep === steps.length ? (
-            <div>
-                {signup()}
+        <div className={classes.paper}>
+          <div className={classes.form}>
+            <div className={classes.logo}>
+              <img src="../../../../images/mk_logo4.png" />
             </div>
-                
-            ) : (
-              <React.Fragment>
-                {getStepContent(activeStep)}
-                <div className={classes.buttons}>
-                </div>
-              </React.Fragment>
-            )}
-          </React.Fragment>
-        </Paper>
-        <Copyright />
-      </main>
+            <Stepper activeStep={activeStep} className={classes.stepper}>
+              {steps.map((label) => (
+                <Step key={label} style={{iconColor: 'red'}}>
+                  <StepLabel StepIconProps={{
+                        classes: {
+                            root: classes.stepIcon,
+                            completed: classes.completed,
+                            active: classes.active
+                        }
+                    }}>{label}</StepLabel>
+                </Step>
+              ))}
+            </Stepper>
+            <React.Fragment>
+              {activeStep === steps.length ?
+                signupResult ?
+                  <div>
+                    <Typography variant="h5" gutterBottom>
+                      회원가입이 완료되었습니다.
+                    </Typography>
+                    <Typography variant="subtitle1">
+                      MK에서 회원가입 승인 후, 웹사이트 이용이 가능합니다.
+                    </Typography>
+                    <Link href="/signin" underline='none'>
+                      <Button
+                        fullWidth
+                        variant="contained"
+                        className={classes.submit}
+                      >
+                        로그인 페이지로 이동
+                      </Button>
+                    </Link>
+                  </div>
+                  : 
+                  ""
+                : 
+                <React.Fragment>
+                  {getStepContent(activeStep)}
+                  <Divider variant="middle" className={classes.hr}/>
+                  <Grid container>
+                    <Grid item xs>
+                      <Link href="/signin" variant="body2" color="textSecondary">
+                        이미 가입하셨나요? 로그인 페이지로 이동
+                      </Link>
+                    </Grid>
+                  </Grid>
+                </React.Fragment>
+              }
+            </React.Fragment>
+          </div>
+        </div>
+      </Container>
     </React.Fragment>
   );
 }

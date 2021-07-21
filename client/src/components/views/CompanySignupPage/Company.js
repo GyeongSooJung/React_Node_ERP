@@ -1,10 +1,5 @@
-import React, { useState, useEffect  } from 'react';
-import Typography from '@material-ui/core/Typography';
-import Grid from '@material-ui/core/Grid';
-import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
-import Button from '@material-ui/core/Button';
+import React, { useState } from 'react';
+import { Typography, Grid, TextField, Button } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
 //리덕스
@@ -18,23 +13,69 @@ import DaumPostCode from 'react-daum-postcode';
 import { useCookies } from "react-cookie";
 
 const useStyles = makeStyles((theme) => ({
-  paper: {
-    marginTop: theme.spacing(8),
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
+  verticalCenter: {
+      display: 'flex',
+      alignItems: 'center',
   },
-  avatar: {
-    margin: theme.spacing(1),
-    backgroundColor: theme.palette.secondary.main,
-  },
-  form: {
-    width: '100%', // Fix IE 11 issue.
+  colorButton: {
     marginTop: theme.spacing(3),
+    backgroundColor: '#d32f2f',
+    color: 'white',
+    
+    '&:hover': {
+        backgroundColor: '#b52626',
+        color: '#f5f5f5'
+    }
   },
-  submit: {
-    margin: theme.spacing(3, 0, 2),
+  noColorButton: {
+    marginTop: theme.spacing(3),
+    marginRight: theme.spacing(1),
+    backgroundColor: 'grey',
+    color: 'white',
+    
+    '&:hover': {
+        backgroundColor: '#666666',
+        color: 'white'
+    }
   },
+  flexRight: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+    alignItems: 'center'
+  },
+  formButton: {
+      margin: theme.spacing(1.1, 0, 0, 2),
+      padding: theme.spacing(3.5, 2),
+      width: '30%',
+      height: '1.1876em',
+      backgroundColor: '#d32f2f',
+      color: 'white',
+      
+      '&:hover': {
+          backgroundColor: '#b52626',
+          color: '#f5f5f5'
+      },
+      
+      '&$disabled': {
+        backgroundColor: '#901e1e',
+        color: '#e5e5e5'
+      }
+  },
+  disabled: {},
+  // textfield focus label style
+  floatingLabelFocusStyle: {
+    '&$focused': {
+        color: '#d32f2f'
+    }
+  },
+  // textfield focus box style
+  fieldFocusStyle: {
+    '&$focused $notchedOutline': {
+        borderColor: '#d32f2f'
+    }
+  },
+  focused: {},
+  notchedOutline: {},
 }));
 
 export default function CompanytForm(props) {
@@ -77,7 +118,7 @@ export default function CompanytForm(props) {
     dispatch(cnuCheck(user))
     .then(response => {
             if(response.payload.CRNumber == "complete") {
-              alert('확인됐습니다.');
+              alert('유효한 사업자번호입니다.');
               setCNUcheck(response.payload.CRNumber);
             }
             else if (response.payload.CRNumber == "duplicated"){
@@ -112,206 +153,299 @@ export default function CompanytForm(props) {
   const Addresspop = () => {
     setAddressOn(true);
   }
+  
+  const numValidation = (input) => {
+    let check = /[^-0-9]/g;
+    return check.test(input);
+  }
 
   return (
     <React.Fragment>
       <Typography variant="h6" gutterBottom>
         사업자 정보
       </Typography>
-      <form className={classes.form} onSubmit={onNextHandler}>
-        <Grid container spacing={3}>
-          <Grid item xs={12} sm={8}>
+      <form onSubmit={onNextHandler}>
+        <Grid container>
+          <Grid item xs={12} className={classes.verticalCenter}>
             <TextField
               variant="outlined"
+              margin="normal"
               required
               fullWidth
               name="CNU"
               label="사업자등록번호"
               type="text"
               id="CNU"
+              InputLabelProps={{
+                classes: {
+                    root: classes.floatingLabelFocusStyle,
+                    focused: classes.focused
+                }
+              }}
+              InputProps={{
+                classes: {
+                  root: classes.fieldFocusStyle,
+                  focused: classes.focused,
+                  notchedOutline: classes.notchedOutline
+                },
+              }}
               value={CNU}
               onChange={onDataHandler}
-              InputProps={{
-                readOnly : () => { return userbody.CNU ? true : false }
-              }}
               disabled={CNUcheck}
             />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-              <Button 
-                  variant="contained"
-                  color="primary"
-                  fullWidth
-                  size='large'
-                  onClick={onCNUcheckHandler}
-                  disabled={CNUcheck}
-              >
-              인증
-              </Button>
+            <Button
+              className={classes.formButton}
+              onClick={onCNUcheckHandler}
+              disabled={CNUcheck}
+              classes={{
+                disabled: classes.disabled
+              }}
+            >
+            인증
+            </Button>
           </Grid>
           <Grid item xs={12}>
             <TextField
               variant="outlined"
+              margin="normal"
               required
               fullWidth
               name="CNA"
               label="업체명"
               type="text"
               id="CNA"
+              InputLabelProps={{
+                classes: {
+                    root: classes.floatingLabelFocusStyle,
+                    focused: classes.focused
+                }
+              }}
+              InputProps={{
+                classes: {
+                  root: classes.fieldFocusStyle,
+                  focused: classes.focused,
+                  notchedOutline: classes.notchedOutline
+                },
+              }}
               value={CNA}
               onChange={onDataHandler}
-              InputProps={{
-                readOnly : () => { return userbody.CNA ? true : false }
-              }}
             />
           </Grid>
-          <Grid item xs={12} sm={8}>
+          <Grid item xs={12} className={classes.verticalCenter}>
             <TextField
               variant="outlined"
+              margin="normal"
               required
               fullWidth
               name="CAD"
               label="주소"
               type="text"
               id="CAD"
+              InputLabelProps={{
+                classes: {
+                    root: classes.floatingLabelFocusStyle,
+                    focused: classes.focused
+                }
+              }}
+              InputProps={{
+                classes: {
+                  root: classes.fieldFocusStyle,
+                  focused: classes.focused,
+                  notchedOutline: classes.notchedOutline
+                },
+              }}
               value={CAD}
               onChange={onDataHandler}
-              InputProps={{
-                readOnly : () => { return userbody.CAD ? true : false }
-              }}
               disabled="true"
             />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-              <Button 
-                  variant="contained"
-                  color="primary"
-                  fullWidth
-                  size='large'
-                  onClick={Addresspop}
-              >
-              주소 검색
-              </Button>
+            <Button
+              className={classes.formButton}
+              onClick={Addresspop}
+            >
+            주소 검색
+            </Button>
           </Grid>
           {AddressOn ? <DaumPostCode onComplete={handleComplete} className="post-code" /> : ""}
           <Grid item xs={12}>
-            <TextField
+            <TextField style={{marginTop: '2px'}}
               variant="outlined"
+              margin="normal"
               required
               fullWidth
               name="CAD2"
               label="상세 주소"
               type="text"
               id="CAD2"
+              InputLabelProps={{
+                classes: {
+                    root: classes.floatingLabelFocusStyle,
+                    focused: classes.focused
+                }
+              }}
+              InputProps={{
+                classes: {
+                  root: classes.fieldFocusStyle,
+                  focused: classes.focused,
+                  notchedOutline: classes.notchedOutline
+                },
+              }}
               value={CAD2}
               onChange={onDataHandler}
-              InputProps={{
-                readOnly : () => { return userbody.CAD2 ? true : false }
-              }}
             />
           </Grid>
           <Grid item xs={12}>
             <TextField
+              error={numValidation(CTEL)}
+              helperText={(CTEL.length != 0) && numValidation(CTEL) ? "숫자만 입력해주세요." : ""}
               variant="outlined"
+              margin="normal"
               required
               fullWidth
               name="CTEL"
               label="사업자 전화번호"
               type="text"
               id="CTEL"
+              InputLabelProps={{
+                classes: {
+                    root: classes.floatingLabelFocusStyle,
+                    focused: classes.focused
+                }
+              }}
+              InputProps={{
+                classes: {
+                  root: classes.fieldFocusStyle,
+                  focused: classes.focused,
+                  notchedOutline: classes.notchedOutline
+                },
+              }}
               value={CTEL}
               onChange={onDataHandler}
-              InputProps={{
-                readOnly : () => { return userbody.CTEL ? true : false }
-              }}
             />
           </Grid>
           <Grid item xs={12}>
             <TextField
+              error={numValidation(CFAX)}
+              helperText={(CFAX.length != 0) && numValidation(CFAX) ? "숫자만 입력해주세요." : ""}
               variant="outlined"
+              margin="normal"
               required
               fullWidth
               name="CFAX"
               label="사업자 팩스번호"
               type="text"
               id="CFAX"
+              InputLabelProps={{
+                classes: {
+                    root: classes.floatingLabelFocusStyle,
+                    focused: classes.focused
+                }
+              }}
+              InputProps={{
+                classes: {
+                  root: classes.fieldFocusStyle,
+                  focused: classes.focused,
+                  notchedOutline: classes.notchedOutline
+                },
+              }}
               value={CFAX}
               onChange={onDataHandler}
-              InputProps={{
-                readOnly : () => { return userbody.CFAX ? true : false }
-              }}
             />
           </Grid>
           <Grid item xs={12}>
             <TextField
               variant="outlined"
+              margin="normal"
               required
               fullWidth
               name="CEM"
               label="사업자 이메일"
               type="email"
               id="CEM"
+              InputLabelProps={{
+                classes: {
+                    root: classes.floatingLabelFocusStyle,
+                    focused: classes.focused
+                }
+              }}
+              InputProps={{
+                classes: {
+                  root: classes.fieldFocusStyle,
+                  focused: classes.focused,
+                  notchedOutline: classes.notchedOutline
+                },
+              }}
               value={CEM}
               onChange={onDataHandler}
-              InputProps={{
-                readOnly : () => { return userbody.CEM ? true : false }
-              }}
             />
           </Grid>
           <Grid item xs={12}>
             <TextField
               variant="outlined"
+              margin="normal"
               required
               fullWidth
               name="CEON"
               label="대표자 이름"
               type="text"
               id="CEON"
+              InputLabelProps={{
+                classes: {
+                    root: classes.floatingLabelFocusStyle,
+                    focused: classes.focused
+                }
+              }}
+              InputProps={{
+                classes: {
+                  root: classes.fieldFocusStyle,
+                  focused: classes.focused,
+                  notchedOutline: classes.notchedOutline
+                },
+              }}
               value={CEON}
               onChange={onDataHandler}
-              InputProps={{
-                readOnly : () => { return userbody.CEON ? true : false }
-              }}
             />
           </Grid>
           <Grid item xs={12}>
             <TextField
+              error={numValidation(CEOP)}
+              helperText={(CEOP.length != 0) && numValidation(CEOP) ? "숫자만 입력해주세요." : ""}
               variant="outlined"
+              margin="normal"
               required
               fullWidth
               name="CEOP"
               label="대표자 전화번호"
               type="text"
               id="CEOP"
+              InputLabelProps={{
+                classes: {
+                    root: classes.floatingLabelFocusStyle,
+                    focused: classes.focused
+                }
+              }}
+              InputProps={{
+                classes: {
+                  root: classes.fieldFocusStyle,
+                  focused: classes.focused,
+                  notchedOutline: classes.notchedOutline
+                },
+              }}
               value={CEOP}
               onChange={onDataHandler}
-              InputProps={{
-                readOnly : () => { return userbody.CEOP ? true : false }
-              }}
             />
           </Grid>
-          <Grid item xs={12} sm={4} />
-          <Grid item xs={12} sm={4}>
+          <Grid item xs={12} className={classes.flexRight}>
             <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              color="primary"
-              className={classes.submit}
+              className={classes.noColorButton}
               onClick={onBeforeHandler}
             >
-              이전
+            이전
             </Button>
-          </Grid>
-          <Grid item xs={12} sm={4}>
             <Button
               type="submit"
-              fullWidth
-              variant="contained"
-              color="primary"
-              className={classes.submit}
+              className={classes.colorButton}
             >
-              다음
+            다음
             </Button>
           </Grid>
         </Grid>

@@ -1,14 +1,6 @@
 import React, { useState, useEffect} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import Typography from '@material-ui/core/Typography';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
-import Grid from '@material-ui/core/Grid';
-import TextField from '@material-ui/core/TextField';
-import Checkbox from '@material-ui/core/Checkbox';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Button from '@material-ui/core/Button';
+import { Typography, Grid, TextField, Button, Link, Box } from '@material-ui/core';
 
 //리덕스
 import {useDispatch} from 'react-redux';
@@ -18,50 +10,103 @@ import {signupCompany} from '../../../_actions/user_action';
 //주소 검색
 import DaumPostCode from 'react-daum-postcode';
 
+// history -> 페이지 이동처리
+import { useHistory } from "react-router-dom";
+
 //쿠키 사용
 import { useCookies } from "react-cookie";
 
 //z//bcrypt
 
 const useStyles = makeStyles((theme) => ({
-  paper: {
-    marginTop: theme.spacing(8),
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
+  verticalCenter: {
+      display: 'flex',
+      alignItems: 'center',
   },
-  avatar: {
-    margin: theme.spacing(1),
-    backgroundColor: theme.palette.secondary.main,
-  },
-  form: {
-    width: '100%', // Fix IE 11 issue.
+  colorButton: {
     marginTop: theme.spacing(3),
+    padding: theme.spacing(1, 2),
+    backgroundColor: '#d32f2f',
+    color: 'white',
+    
+    '&:hover': {
+        backgroundColor: '#b52626',
+        color: '#f5f5f5'
+    }
   },
-  submit: {
-    margin: theme.spacing(3, 0, 2),
+  noColorButton: {
+    marginTop: theme.spacing(3),
+    marginRight: theme.spacing(1),
+    padding: theme.spacing(1, 2),
+    backgroundColor: 'grey',
+    color: 'white',
+    
+    '&:hover': {
+        backgroundColor: '#666666',
+        color: 'white'
+    }
   },
+  flexRight: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+    alignItems: 'center'
+  },
+  formButton: {
+      margin: theme.spacing(1.1, 0, 0, 2),
+      padding: theme.spacing(3.5, 2),
+      width: '30%',
+      height: '1.1876em',
+      backgroundColor: '#d32f2f',
+      color: 'white',
+      
+      '&:hover': {
+          backgroundColor: '#b52626',
+          color: '#f5f5f5'
+      },
+      
+      '&$disabled': {
+        backgroundColor: '#901e1e',
+        color: '#e5e5e5'
+      }
+  },
+  disabled: {},
+  // textfield focus label style
+  floatingLabelFocusStyle: {
+    '&$focused': {
+        color: '#d32f2f'
+    }
+  },
+  // textfield focus box style
+  fieldFocusStyle: {
+    '&$focused $notchedOutline': {
+        borderColor: '#d32f2f'
+    }
+  },
+  focused: {},
+  notchedOutline: {},
 }));
 
 export default function Review(props) {
 
   const classes = useStyles();
   const dispatch = useDispatch();
+  const history = useHistory();
   
   const [cookies, setCookie, removeCookie] = useCookies(['hashAuth']);
   
   
   let userbody = props.formParent.user;
   let activeStep = props.formParent.activeStep;
+  let signupResult = props.formParent.signupResult;
   
   let [user, setUserState] = useState(userbody);
-  let [emailcertCheck, setEmailCertCheck] = useState("");
+  let [emailcertCheck, setEmailCertCheck] = useState(false);
   let [emailsendCheck, setEmailSendCheck] = useState(false);
   let [minutes, setMinutes] = useState(parseInt(0));
   let [seconds, setSeconds] = useState(parseInt(0));
   
   let [authCookie, setAuthCookie] = useState("");
-  let [Cookiebool, setCookieBool] = useState(true);
+  let [CookieBool, setCookieBool] = useState(false);
   
     // 주소 확인 여부
   let [AddressOn, setAddressOn] = useState(false);
@@ -85,61 +130,70 @@ export default function Review(props) {
   
     // 주소 검색 기능
   const handleComplete = (data) => {
-        let fullAddress = data.address;
-        let extraAddress = '';
-        if (data.addressType === 'R') {
-            if (data.bname !== '') {
-                extraAddress += data.bname;
-            }
-            if (data.buildingName !== '') {
-                extraAddress += (extraAddress !== '' ? `, ${data.buildingName}` : data.buildingName);
-            }
-            fullAddress += (extraAddress !== '' ? ` (${extraAddress})` : '');
+    let fullAddress = data.address;
+    let extraAddress = '';
+    if (data.addressType === 'R') {
+        if (data.bname !== '') {
+            extraAddress += data.bname;
         }
-        //fullAddress -> 전체 주소반환
-        user.EAD = fullAddress;
-        setUserState(user);
-        setAddressOn(false);
+        if (data.buildingName !== '') {
+            extraAddress += (extraAddress !== '' ? `, ${data.buildingName}` : data.buildingName);
+        }
+        fullAddress += (extraAddress !== '' ? ` (${extraAddress})` : '');
     }
+    //fullAddress -> 전체 주소반환
+    user.EAD = fullAddress;
+    setUserState(user);
+    setAddressOn(false);
+  }
     
   const Addresspop = () => {
     setAddressOn(true);
   }
   const emailsendHandler = async () => {
-    dispatch(emailSend(user))
-    .then(response => {
-      if(response.payload.result == 'send') {
-        setEmailSendCheck(true);
-        setMinutes(5);
-        setSeconds(0);
-        const hashAuth = response.payload.hashAuth;
-        setCookie('hashAuth',hashAuth,{path: '/', expires: new Date(Date.now()+300000)});
-        
-        setAuthCookie(hashAuth);
-      }
-      else if(response.payload.result == 'exist') {
-        alert('중복된 이메일이 존재합니다.')
-      }
-      else {
-        alert('다시 확인해주세요.')
-      }
-        
-      });
-  }
-  
-  const emailcertHandler = (event) => {
-    dispatch(emailCert({CEA : authNum, CEA2 : authCookie}))
-    .then(response => {
-        if(response.payload.result == 'success') {
-          setEmailCertCheck(true);
-          setCookieBool(false);
-          alert('확인됐습니다.');
-          removeCookie('hashAuth');
-        } 
+    if(EEM.length != 0) {
+      dispatch(emailSend(user))
+      .then(response => {
+        if(response.payload.result == 'send') {
+          setEmailSendCheck(true);
+          setMinutes(0);
+          setSeconds(5);
+          const hashAuth = response.payload.hashAuth;
+          setCookie('hashAuth',hashAuth,{path: '/', expires: new Date(Date.now()+300000)});
+          
+          setAuthCookie(hashAuth);
+        }
+        else if(response.payload.result == 'exist') {
+          alert('중복된 이메일이 존재합니다.');
+        }
         else {
           alert('다시 확인해주세요.');
         }
-      })
+          
+        });
+    }
+    else {
+      alert('이메일을 입력해주세요.');
+    }
+  }
+  
+  const emailcertHandler = (event) => {
+    if(authNum.length != 0 ) {
+      dispatch(emailCert({CEA : authNum, CEA2 : authCookie}))
+      .then(response => {
+          if(response.payload.result == 'success') {
+            setEmailCertCheck(true);
+            alert('인증되었습니다.');
+            removeCookie('hashAuth');
+          }
+          else {
+            alert('인증번호를 다시 입력해주세요.');
+          }
+        })
+    }
+    else {
+      alert('인증번호를 입력해주세요.');
+    }
   }
   
   const onSignupHandler = (event) => {
@@ -148,41 +202,63 @@ export default function Review(props) {
       alert('이메일 인증을 받아주세요.');
     }
     else {
-      console.log(user)
-      // alert('회원가입이 완료되었습니다. 로그인해주세요');
-      // const data = { user : user, activeStep : activeStep + 1 };
-      // props.onChange(data);
-      
-      const data = { user : user, activeStep : activeStep + 1 };
-      props.onChange(data);
+        dispatch(signupCompany(user))
+        .then(response => {
+          if(response.payload.result == true) {
+            let data = { user : user, activeStep : activeStep + 1, signupResult : true };
+            props.onChange(data);
+          }
+          else {
+            let data = { user : user, activeStep : activeStep + 1, signupResult : false };
+            props.onChange(data);
+            alert('회원가입에 실패했습니다.\n정해진 양식에 맞게 다시 진행해주세요.');
+            history.push('/signup');
+          }
+        });
     }
   }
   
-  useEffect(() => {
-    if(cookies.hashAuth !== undefined){
-      setCookieBool(true)
-    }
-    else {
-      setCookieBool(false)
-    }
-  },[]);
+  const numValidation = (input) => {
+    let check = /[^-0-9]/g;
+    return check.test(input);
+  }
   
   useEffect(() => {
-  const countdown = setInterval(() => {
-    if (parseInt(seconds) > 0) {
-      setSeconds(parseInt(seconds) - 1);
+    console.log(cookies.hashAuth);
+    if(!cookies.hashAuth){
+      setCookieBool(false);
+      console.log('bye');
     }
-    if (parseInt(seconds) === 0) {
-      if (parseInt(minutes) === 0) {
-          clearInterval(countdown);
-      } else {
-        setMinutes(parseInt(minutes) - 1);
-        setSeconds(59);
+    else {
+      setCookieBool(true);
+      console.log('hi');
+    }
+  },[cookies.hashAuth]);
+  
+  useEffect(() => {
+    const countdown = setInterval(() => {
+      if (parseInt(seconds) > 0) {
+        setSeconds(parseInt(seconds) - 1);
       }
-    }
-  }, 1000);
-  return () => clearInterval(countdown);
-}, [minutes, seconds]);
+      if (parseInt(seconds) === 0) {
+        if (parseInt(minutes) === 0) {
+          if(!emailcertCheck && CookieBool) {
+            clearInterval(countdown);
+            setEmailSendCheck(false);
+            removeCookie('hashAuth');
+            alert("인증번호가 만료되었습니다.");
+          }
+          else {
+            clearInterval(countdown);
+          }
+        } else {
+          setMinutes(parseInt(minutes) - 1);
+          setSeconds(59);
+        }
+      }
+    }, 1000);
+    return () => clearInterval(countdown);
+  }, [minutes, seconds]);
 
   return (
     <React.Fragment>
@@ -190,169 +266,257 @@ export default function Review(props) {
         개인 정보
       </Typography>
       
-      <form className={classes.form} onSubmit={onSignupHandler}>
-        <Grid container spacing={2}>
+      <form onSubmit={onSignupHandler}>
+        <Grid container>
           <Grid item xs={12}>
             <TextField
               variant="outlined"
+              margin="normal"
               required
               fullWidth
               name="ENA"
               label="이름"
               type="text"
               id="ENA"
+              InputLabelProps={{
+                classes: {
+                    root: classes.floatingLabelFocusStyle,
+                    focused: classes.focused
+                }
+              }}
+              InputProps={{
+                classes: {
+                  root: classes.fieldFocusStyle,
+                  focused: classes.focused,
+                  notchedOutline: classes.notchedOutline
+                },
+              }}
               value={ENA}
               onChange={onDataHandler}
-              InputProps={{
-                readOnly : () => { return userbody.ENA ? true : false }
-              }}
             />
           </Grid>
           
-          <Grid item xs={12} sm={8}>
+          <Grid item xs={12} className={classes.verticalCenter}>
             <TextField
               variant="outlined"
+              margin="normal"
               required
               fullWidth
               name="EAD"
               label="주소"
               type="text"
               id="EAD"
+              InputLabelProps={{
+                classes: {
+                    root: classes.floatingLabelFocusStyle,
+                    focused: classes.focused
+                }
+              }}
+              InputProps={{
+                classes: {
+                  root: classes.fieldFocusStyle,
+                  focused: classes.focused,
+                  notchedOutline: classes.notchedOutline
+                },
+              }}
               value={EAD}
               onChange={onDataHandler}
-              InputProps={{
-                readOnly : () => { return userbody.EAD ? true : false }
-              }}
               disabled="true"
             />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-              <Button 
-                  variant="contained"
-                  color="primary"
-                  fullWidth
-                  size='large'
-                  onClick={Addresspop}
-              >
-              주소 검색
-              </Button>
+            <Button 
+              className={classes.formButton}
+              onClick={Addresspop}
+            >
+            주소 검색
+            </Button>
           </Grid>
           {AddressOn ? <DaumPostCode onComplete={handleComplete} className="post-code" /> : ""}
           <Grid item xs={12}>
-            <TextField
+            <TextField style={{marginTop: '2px'}}
               variant="outlined"
+              margin="normal"
               required
               fullWidth
               name="EAD2"
               label="상세 주소"
               type="text"
               id="EAD2"
+              InputLabelProps={{
+                classes: {
+                    root: classes.floatingLabelFocusStyle,
+                    focused: classes.focused
+                }
+              }}
+              InputProps={{
+                classes: {
+                  root: classes.fieldFocusStyle,
+                  focused: classes.focused,
+                  notchedOutline: classes.notchedOutline
+                },
+              }}
               value={EAD2}
               onChange={onDataHandler}
-              InputProps={{
-                readOnly : () => { return userbody.EAD2 ? true : false }
-              }}
             />
           </Grid>
           <Grid item xs={12}>
             <TextField
+              error={numValidation(EPH)}
+              helperText={(EPH.length != 0) && numValidation(EPH) ? "숫자만 입력해주세요." : ""}
               variant="outlined"
+              margin="normal"
               required
               fullWidth
               name="EPH"
               label="휴대폰번호"
               type="text"
               id="EPH"
+              InputLabelProps={{
+                classes: {
+                    root: classes.floatingLabelFocusStyle,
+                    focused: classes.focused
+                }
+              }}
+              InputProps={{
+                classes: {
+                  root: classes.fieldFocusStyle,
+                  focused: classes.focused,
+                  notchedOutline: classes.notchedOutline
+                },
+              }}
               value={EPH}
               onChange={onDataHandler}
-              InputProps={{
-                readOnly : () => { return userbody.EPH ? true : false }
-              }}
             />
           </Grid>
           
           {emailsendCheck ?
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={8}>
+          <Grid container>
+            <Grid item xs={12} className={classes.verticalCenter}>
               <TextField
                 variant="outlined"
+                margin="normal"
                 required
                 fullWidth
                 name="EEM"
                 label="이메일"
                 type="text"
                 id="EEM"
+                InputLabelProps={{
+                classes: {
+                    root: classes.floatingLabelFocusStyle,
+                    focused: classes.focused
+                }
+              }}
+              InputProps={{
+                classes: {
+                  root: classes.fieldFocusStyle,
+                  focused: classes.focused,
+                  notchedOutline: classes.notchedOutline
+                },
+              }}
                 value={EEM}
                 onChange={onDataHandler}
-                InputProps={{
-                  readOnly : () => { return userbody.EEM ? true : false }
-                }}
                 disabled
               />
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <Button 
-                variant="contained"
-                color="primary"
-                fullWidth
-                size='large'
-                onClick={emailsendHandler}
-                disabled
+              {CookieBool ?
+              <Box
+                width="30%"
+                mt={1}
+                display="flex"
+                flexDirection="column"
+                justifyContent="center"
+                alignItems="center"
+              >
+                <Link
+                  disabled
+                  mb={1}
+                  variant="body1"
+                  color="error"
+                  underline="none"
                 >
                 {minutes}:{seconds < 10 ? `0${seconds}` : seconds}
-              </Button>
+                </Link>
+                <Link
+                  style={{cursor: "pointer"}}
+                  variant="body2"
+                  color="textSecondary"
+                  onClick={emailsendHandler}
+                >
+                재전송
+                </Link>
+              </Box>
+              :
+              null
+              }
             </Grid>
-            
-            <Grid item xs={12} sm={8}>
+            <Grid item xs={12} className={classes.verticalCenter}>
               <TextField
-              variant="outlined"
+                variant="outlined"
+                margin="normal"
                 required
                 fullWidth
                 name="authNum"
                 label="인증 번호"
+                disabled={emailcertCheck}
                 type="text"
                 id="authNum"
+                InputLabelProps={{
+                  classes: {
+                      root: classes.floatingLabelFocusStyle,
+                      focused: classes.focused
+                  }
+                }}
+                InputProps={{
+                  classes: {
+                    root: classes.fieldFocusStyle,
+                    focused: classes.focused,
+                    notchedOutline: classes.notchedOutline
+                  },
+                }}
                 value={authNum}
                 onChange={onDataHandler}
-            />
-            </Grid>
-            <Grid item xs={12} sm={4}>
-                <Button 
-                  variant="contained"
-                  color="primary"
-                  fullWidth
-                  size='large'
-                  onClick={emailcertHandler}
-                  disabled = {Cookiebool}
-                  >
-                  인증
-                </Button>
+              />
+              <Button
+                className={classes.formButton}
+                onClick={emailcertHandler}
+                disabled={emailcertCheck}
+                classes={{
+                  disabled: classes.disabled
+                }}
+                >
+                인증
+              </Button>
             </Grid>
           </Grid>
           : 
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={8}>
+          <Grid container>
+            <Grid item xs={12} className={classes.verticalCenter}>
               <TextField
                 variant="outlined"
+                margin="normal"
                 required
                 fullWidth
                 name="EEM"
                 label="이메일"
                 type="text"
                 id="EEM"
+                InputLabelProps={{
+                  classes: {
+                      root: classes.floatingLabelFocusStyle,
+                      focused: classes.focused
+                  }
+                }}
+                InputProps={{
+                  classes: {
+                    root: classes.fieldFocusStyle,
+                    focused: classes.focused,
+                    notchedOutline: classes.notchedOutline
+                  },
+                }}
                 value={EEM}
                 onChange={onDataHandler}
-                InputProps={{
-                  readOnly : () => { return userbody.EEM ? true : false }
-                }}
               />
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <Button 
-                variant="contained"
-                color="primary"
-                fullWidth
-                size='large'
+              <Button
+                className={classes.formButton}
                 onClick={emailsendHandler}
                 >
                 보내기
@@ -360,30 +524,18 @@ export default function Review(props) {
             </Grid>
           </Grid>
           }
-          
-          
-          <Grid item xs={12} sm={4} />
-          <Grid item xs={12} sm={4}>
+          <Grid item xs={12} className={classes.flexRight}>
             <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              color="primary"
-              className={classes.submit}
+              className={classes.noColorButton}
               onClick={onBeforeHandler}
             >
-              이전
+            이전
             </Button>
-          </Grid>
-          <Grid item xs={12} sm={4}>
             <Button
               type="submit"
-              fullWidth
-              variant="contained"
-              color="primary"
-              className={classes.submit}
+              className={classes.colorButton}
             >
-              회원 가입
+            회원가입
             </Button>
           </Grid>
         </Grid>

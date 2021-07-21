@@ -103,7 +103,7 @@ exports.modelQuery = async (query,collection,doc,option) => {
         
         else {
             try {
-            one = await Collection.create(doc).then(resResult);
+                one = await Collection.create(doc).then(resResult);
             }
             catch(err) {
                 console.log(err)

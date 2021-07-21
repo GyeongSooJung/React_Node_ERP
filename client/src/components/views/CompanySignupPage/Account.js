@@ -1,10 +1,5 @@
-import React, { useState, useEffect  } from 'react';
-import Grid from '@material-ui/core/Grid';
-import Typography from '@material-ui/core/Typography';
-import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
-import Button from '@material-ui/core/Button';
+import React, { useState } from 'react';
+import { Grid, Typography, TextField, FormControlLabel, Checkbox, Button } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
 // 패스워드 아이콘
@@ -17,23 +12,58 @@ import {useDispatch} from 'react-redux';
 import {idDupleCheck} from '../../../_actions/user_action';
 
 const useStyles = makeStyles((theme) => ({
-  paper: {
-    marginTop: theme.spacing(8),
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
+  verticalCenter: {
+      display: 'flex',
+      alignItems: 'center',
   },
-  avatar: {
-    margin: theme.spacing(1),
-    backgroundColor: theme.palette.secondary.main,
-  },
-  form: {
-    width: '100%', // Fix IE 11 issue.
+  colorButton: {
     marginTop: theme.spacing(3),
+    backgroundColor: '#d32f2f',
+    color: 'white',
+    
+    '&:hover': {
+        backgroundColor: '#b52626',
+        color: '#f5f5f5'
+    }
   },
-  submit: {
-    margin: theme.spacing(3, 0, 2),
+  flexRight: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+    alignItems: 'center'
   },
+  formButton: {
+      margin: theme.spacing(1.1, 0, 0, 2),
+      padding: theme.spacing(3.5, 2),
+      width: '30%',
+      height: '1.1876em',
+      backgroundColor: '#d32f2f',
+      color: 'white',
+      
+      '&:hover': {
+        backgroundColor: '#b52626',
+        color: '#f5f5f5'
+      },
+      
+      '&$disabled': {
+        backgroundColor: '#901e1e',
+        color: '#e5e5e5'
+      }
+  },
+  disabled: {},
+  // textfield focus label style
+  floatingLabelFocusStyle: {
+    '&$focused': {
+        color: '#d32f2f'
+    }
+  },
+  // textfield focus box style
+  fieldFocusStyle: {
+    '&$focused $notchedOutline': {
+        borderColor: '#d32f2f'
+    }
+  },
+  focused: {},
+  notchedOutline: {},
 }));
 
 export default function AccountForm(props) {
@@ -54,8 +84,8 @@ export default function AccountForm(props) {
     {
       alert('ID 중복체크를 해주세요.')
     }
-    else if (EPW.length < 6) {
-      alert('비밀번호를 6자 이상으로 써주세요.')
+    else if (EPW.length < 8) {
+      alert('비밀번호를 8자 이상으로 써주세요.')
     }
     else if (EPW != PWC) {
       alert('현재 비밀번호와 확인 비밀번호가 다릅니다.')
@@ -72,22 +102,21 @@ export default function AccountForm(props) {
   }
   
   const onIDcheckHandler = (event) => {
-    dispatch(idDupleCheck(user))
-        .then(response => {
-            if(response.payload.result) {
-              alert('확인됐습니다.');
-              setIDcheck(true);
-            } else {
-                alert('중복된 아이디가 존재합니다.');
-            }
-        })
-  }
-  
-  const hasError = passwordEntered =>
-        EPW.length < 6 ? true : false;
-  
-  const hasNotSameError = passwordEntered =>
-        EPW != PWC ? true : false; 
+    if(EID.length != 0) {
+      dispatch(idDupleCheck(user))
+          .then(response => {
+              if(response.payload.result) {
+                alert('사용 가능한 아이디입니다.');
+                setIDcheck(true);
+              } else {
+                  alert('중복된 아이디가 존재합니다.');
+              }
+          })
+    }
+    else {
+      alert('아이디를 입력해주세요.');
+    }
+  };
         
   return (
     <React.Fragment>
@@ -95,92 +124,114 @@ export default function AccountForm(props) {
         계정 정보
       </Typography>
       <form className={classes.form} onSubmit={onNextHandler}>
-        <Grid container spacing={3}>
-          <Grid item xs={12} sm={8}>
-                  <TextField
-                      variant="outlined"
-                      required
-                      fullWidth
-                      id="EID"
-                      label="아이디"
-                      name="EID"
-                      autoComplete="ID"
-                      value={EID}
-                      onChange={onDataHandler}
-                      InputProps={{
-                        readOnly : () => { return userbody.CID ? true : false }
-                      }}
-                      disabled={IDcheck}
-                  />
-              </Grid>
-              <Grid item xs={12} sm={4}>
-                  <Button 
-                      variant="contained"
-                      color="primary"
-                      fullWidth
-                      size='large'
-                      onClick={onIDcheckHandler}
-                      disabled={IDcheck}
-                  >
-                   중복 확인
-                  </Button>
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  error={hasError('password')}
-                  helperText={(EPW.length > 6) ? "" : "6자 이상 입력해주세요."}
-                  variant="outlined"
-                  required
-                  fullWidth
-                  name="EPW"
-                  label="비밀번호"
-                  type="password"
-                  id="EPW"
-                  autoComplete="current-password"
-                  value = {EPW}
-                  onChange={onDataHandler}
-                  InputProps={{
-                        readOnly : () => { return userbody.CPW ? true : false }
-                      }}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  error={hasNotSameError('password')}
-                  helperText={(EPW == PWC) ? "" : "현재 비밀번호와 다릅니다."}
-                  variant="outlined"
-                  required
-                  fullWidth
-                  name="PWC"
-                  label="비밀번호 확인"
-                  type="password"
-                  id="PWC"
-                  autoComplete="current-password"
-                  value = {PWC}
-                  onChange={onDataHandler}
-                  InputProps={{
-                        readOnly : () => { return userbody.PWC ? true : false }
-                      }}
-                  endAdornment={
-                    <InputAdornment position="end">
-                        <LockOpenIcon /> 
-                    </InputAdornment>
+        <Grid container>
+          <Grid item xs={12} className={classes.verticalCenter}>
+            <TextField
+              variant="outlined"
+              margin="normal"
+              required
+              fullWidth
+              id="EID"
+              label="아이디"
+              name="EID"
+              autoComplete="ID"
+              InputLabelProps={{
+                  classes: {
+                      root: classes.floatingLabelFocusStyle,
+                      focused: classes.focused
                   }
-                  
-                />
-              </Grid>
-              <Grid item xs={12} sm={8} />
-              <Grid item xs={12} sm={4}>
-                <Button
-                  type="submit"
-                  fullWidth
-                  variant="contained"
-                  color="primary"
-                  className={classes.submit}
-                >
-                  다음
-                </Button>
-              </Grid>
+              }}
+              InputProps={{
+                classes: {
+                  root: classes.fieldFocusStyle,
+                  focused: classes.focused,
+                  notchedOutline: classes.notchedOutline
+                },
+              }}
+              value={EID}
+              onChange={onDataHandler}
+              disabled={IDcheck}
+            />
+            <Button
+              className={classes.formButton}
+              onClick={onIDcheckHandler}
+              disabled={IDcheck}
+              classes={{
+                disabled: classes.disabled
+              }}
+            >
+             중복 확인
+            </Button>
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              error={(EPW.length != 0) && ((EPW.length) < 8 || (EPW.length) > 16)}
+              helperText={(EPW.length != 0) && ((EPW.length) < 8 || (EPW.length) > 16) ? "비밀번호는 8~16자리로 설정해주세요." : ""}
+              variant="outlined"
+              margin="normal"
+              required
+              fullWidth
+              name="EPW"
+              label="비밀번호"
+              type="password"
+              id="EPW"
+              autoComplete="current-password"
+              InputLabelProps={{
+                  classes: {
+                      root: classes.floatingLabelFocusStyle,
+                      focused: classes.focused
+                  }
+              }}
+              InputProps={{
+                classes: {
+                  root: classes.fieldFocusStyle,
+                  focused: classes.focused,
+                  notchedOutline: classes.notchedOutline
+                },
+              }}
+              value = {EPW}
+              onChange={onDataHandler}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              error={(PWC.length != 0) && (EPW != PWC)}
+              helperText={(PWC.length != 0) && (EPW != PWC) ? "비밀번호가 서로 다릅니다." : ""}
+              variant="outlined"
+              margin="normal"
+              required
+              fullWidth
+              name="PWC"
+              label="비밀번호 확인"
+              type="password"
+              id="PWC"
+              autoComplete="current-password"
+              InputLabelProps={{
+                  classes: {
+                      root: classes.floatingLabelFocusStyle,
+                      focused: classes.focused
+                  }
+              }}
+              InputProps={{
+                classes: {
+                  root: classes.fieldFocusStyle,
+                  focused: classes.focused,
+                  notchedOutline: classes.notchedOutline
+                },
+              }}
+              value = {PWC}
+              onChange={onDataHandler}
+            />
+          </Grid>
+          <Grid item xs={12} className={classes.flexRight}>
+            <Button
+              type="submit"
+              variant="contained"
+              className={classes.colorButton}
+            >
+              다음
+            </Button>
+          </Grid>
         </Grid>
       </form>
     </React.Fragment>
