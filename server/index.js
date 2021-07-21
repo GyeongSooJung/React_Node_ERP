@@ -13,15 +13,14 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var authRouter = require('./routes/auth');
 var emailRouter = require('./routes/email');
+var listRouter = require('./routes/list')
 
 
 app.use('/',indexRouter);
 app.use('/users',usersRouter);
 app.use('/auth',authRouter);
-app.use('/email',emailRouter)
-
-
-
+app.use('/email',emailRouter);
+app.use('/list',listRouter);
       
 connect();
     

@@ -17,6 +17,11 @@ import Container from '@material-ui/core/Container';
 import {useDispatch} from 'react-redux';
 import {signinUser} from '../../../_actions/user_action';
 
+//쿠키 사용
+import { useCookies } from "react-cookie";
+
+import { useHistory } from "react-router-dom";
+
 function Copyright() {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
@@ -53,12 +58,16 @@ const useStyles = makeStyles((theme) => ({
 export default function SignIn() {
   const classes = useStyles();
   const dispatch = useDispatch();
+  const history = useHistory();
+  
+  const [cookies, setCookie, removeCookie] = useCookies(['isLogined']);
   
   let loginbody = {
     CNU : "",
     EID : "",
     EPW : "",
   }
+  
   
   let [loginUser, setLoginUser] = useState(loginbody);
   
@@ -73,10 +82,19 @@ export default function SignIn() {
     
     dispatch(signinUser(loginUser))
     .then(response => {
-      console.log(response)
+      console.log(response.payload)
+      if(response.payload.result == true) {
+        setCookie('isLogined',response.payload.isLogined,{path: '/', expires: new Date(Date.now()+86400000)});
+        alert('로그인 성공!');
+        history.push('/dashboard');
+      }
+      else {
+        alert('로그인 실패!');
+      }
     })
-    
   }
+  
+  
 
   return (
     <Container component="main" maxWidth="xs">
