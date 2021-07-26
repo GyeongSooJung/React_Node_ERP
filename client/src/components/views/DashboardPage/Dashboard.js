@@ -12,25 +12,20 @@ import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
 import Badge from '@material-ui/core/Badge';
 import Container from '@material-ui/core/Container';
-import Grid from '@material-ui/core/Grid';
-import Paper from '@material-ui/core/Paper';
 import Link from '@material-ui/core/Link';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import NotificationsIcon from '@material-ui/icons/Notifications';
-import { mainListItems, secondaryListItems } from './listItems';
 
 
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import ListSubheader from '@material-ui/core/ListSubheader';
 import DashboardIcon from '@material-ui/icons/Dashboard';
 import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
 import PeopleIcon from '@material-ui/icons/People';
 import BarChartIcon from '@material-ui/icons/BarChart';
 import LayersIcon from '@material-ui/icons/Layers';
-import AssignmentIcon from '@material-ui/icons/Assignment';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 
@@ -38,7 +33,6 @@ import { useHistory } from "react-router-dom"; // 로그인 안되었을 때
 import { useCookies } from "react-cookie";
 
 import Orders from './Orders'
-import Chart from './Chart'
 import Deposits from './Deposits'
 import BusinessComponent from './Menu/BusinessComponent'
 import ItemComponent from './Menu/ItemComponent'
@@ -142,7 +136,7 @@ export default function Dashboard() {
   const [cookies, setCookie, removeCookie] = useCookies(['isLogined']);
   const history = useHistory();
   useEffect(() => {
-    if(cookies.isLogined == undefined){
+    if(cookies.isLogined === undefined){
       history.push('/')
     }
   },[]);
@@ -159,7 +153,7 @@ export default function Dashboard() {
   const handleDrawerClose = () => {
     setOpen(false);
   };
-  const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
+  // const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
   
   const getDashboardContent = (step) => {
     // console.log("step : " + step)
@@ -195,26 +189,26 @@ export default function Dashboard() {
         break;
         
       case "기초 등록" : 
-        if(menulistOpen == "기초 등록")
+        if(menulistOpen === "기초 등록")
           setMenulistOpen("");
         else
           setMenulistOpen("기초 등록");
         break;
       case "영업" : 
-        if(menulistOpen == "영업")
+        if(menulistOpen === "영업")
           setMenulistOpen("");
         else
           setMenulistOpen("영업");
         break;
       case "회계" : 
         setActiveStep("회계");
-        if(menulistOpen == "회계")
+        if(menulistOpen === "회계")
           setMenulistOpen("");
         else
           setMenulistOpen("회계");
         break;
       case "마이페이지" : 
-        if(menulistOpen == "마이페이지")
+        if(menulistOpen === "마이페이지")
           setMenulistOpen("");
         else
           setMenulistOpen("마이페이지");
@@ -294,9 +288,9 @@ export default function Dashboard() {
               <DashboardIcon />
             </ListItemIcon>
             <ListItemText primary="기초 등록" />
-            {(menulistOpen == "기초 등록") ? <ExpandLess /> : <ExpandMore />}
+            {(menulistOpen === "기초 등록") ? <ExpandLess /> : <ExpandMore />}
           </ListItem>
-          {(menulistOpen == "기초 등록") ? 
+          {(menulistOpen === "기초 등록") ? 
             <List>
               <ListItem
               button
@@ -318,9 +312,9 @@ export default function Dashboard() {
               <ShoppingCartIcon />
             </ListItemIcon>
             <ListItemText primary="영업" />
-            {(menulistOpen == "영업") ? <ExpandLess /> : <ExpandMore />}
+            {(menulistOpen === "영업") ? <ExpandLess /> : <ExpandMore />}
           </ListItem>
-          {(menulistOpen == "영업") ? 
+          {(menulistOpen === "영업") ? 
             <List>
               <ListItem
               button
@@ -347,7 +341,7 @@ export default function Dashboard() {
               <PeopleIcon />
             </ListItemIcon>
             <ListItemText primary="회계" />
-            {(menulistOpen == "회계") ? <ExpandLess /> : <ExpandMore />}
+            {(menulistOpen === "회계") ? <ExpandLess /> : <ExpandMore />}
           </ListItem>
           <ListItem button
           onClick={onMenulistHandler}>
@@ -355,9 +349,9 @@ export default function Dashboard() {
               <BarChartIcon />
             </ListItemIcon>
             <ListItemText primary="마이페이지" />
-            {(menulistOpen == "마이페이지") ? <ExpandLess /> : <ExpandMore />}
+            {(menulistOpen === "마이페이지") ? <ExpandLess /> : <ExpandMore />}
           </ListItem>
-          {(menulistOpen == "마이페이지") ? 
+          {(menulistOpen === "마이페이지") ? 
             <List>
               <ListItem>
                 <ListItemText primary="계정관리" />
@@ -375,7 +369,7 @@ export default function Dashboard() {
               <LayersIcon />
             </ListItemIcon>
             <ListItemText primary="대시 보드" />
-            {(menulistOpen == "대시 보드") ? <ExpandLess /> : <ExpandMore />}
+            {(menulistOpen === "대시 보드") ? <ExpandLess /> : <ExpandMore />}
           </ListItem>
         </List>
         <Divider />

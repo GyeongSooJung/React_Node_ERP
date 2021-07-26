@@ -9,23 +9,15 @@ import TableRow from '@material-ui/core/TableRow';
 import Title from '../Title';
 import Checkbox from '@material-ui/core/Checkbox';
 import TableContainer from '@material-ui/core/TableContainer';
-import TablePagination from '@material-ui/core/TablePagination';
 import TableSortLabel from '@material-ui/core/TableSortLabel';
-import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
 import IconButton from '@material-ui/core/IconButton';
-import Tooltip from '@material-ui/core/Tooltip';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
 import DeleteIcon from '@material-ui/icons/Delete';
-import FilterListIcon from '@material-ui/icons/FilterList';
 import Grid from '@material-ui/core/Grid';
 
 // 정렬 아이콘
 import Button from '@material-ui/core/Button';
-import MenuIcon from '@material-ui/icons/Menu';
 import SearchIcon from '@material-ui/icons/Search';
-import DirectionsIcon from '@material-ui/icons/Directions';
 import InputBase from '@material-ui/core/InputBase';
 import Divider from '@material-ui/core/Divider';
 
@@ -44,7 +36,6 @@ import {deleteData, createData} from '../../../../_actions/list_action';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import TextField from '@material-ui/core/TextField';
 
@@ -233,11 +224,10 @@ export default function Business(props) {
   
   
   function OnTablebodyHandler(props) { //테이블 바디 핸들러
-    let i = 0;
       return (
       <TableBody>
       {listArraypost.map((row,index) => {
-       if(checkedArray[index] != undefined) {
+       if(checkedArray[index] !== undefined) {
         return (
           <TableRow className={classes.tableRow} key={row.id} m="3">
               <TableCell padding="checkbox">
@@ -258,7 +248,6 @@ export default function Business(props) {
           </TableRow>
           )
        }
-       i++;
       })}
       
       
@@ -272,9 +261,9 @@ export default function Business(props) {
       if(result){
         let emptyArray = []; // 빈 배열을 만들고
         for (var i = 0; i < Object.keys(checkedArray).length; i++ ) { // 체크박스에 담겨있는 것들의 갯수 
-          if(checkedArray[i].checked == true) { // 체크가 되어있으면
+          if(checkedArray[i].checked === true) { // 체크가 되어있으면
             for( var x = 0; x < rows.length; x ++) {// 데이터베이스에서 불러온 내용들 중에서 CNU를 뽑아낸다
-              if(checkedArray[i].rowsid == rows[x].id)
+              if(checkedArray[i].rowsid === rows[x].id)
               emptyArray.push(rows[x].CNU); // 삭제할 CNU를 담는다.
             }
           }
@@ -282,7 +271,7 @@ export default function Business(props) {
         
         dispatch(deleteData(emptyArray))
         .then(response => {
-          if(response.payload.result == true) {
+          if(response.payload.result === true) {
             // 서버에서 받아온 데이터를 이용해 rows에서 해당 내용 제거
             
             // 제거한 후 listAll 바꿔줌(바뀐 rows로)
@@ -304,7 +293,7 @@ export default function Business(props) {
     
     dispatch(createData(companyBody))
     .then(response => {
-      if(response.payload.result == true) {
+      if(response.payload.result === true) {
             // 서버에서 받아온 데이터를 이용해 rows에서 해당 내용 제거
             
             // 제거한 후 listAll 바꿔줌(바뀐 rows로)
@@ -399,7 +388,7 @@ export default function Business(props) {
       let emptyJson = {};
       let j = 0;
       for (var i = start; i < end; i ++) {
-        if(listArrayall.array[i] != undefined) {
+        if(listArrayall.array[i] !== undefined) {
           emptyJson[j] = {indexid : j, rowsid : i, checked : false}
         }
         j++;
@@ -428,7 +417,7 @@ export default function Business(props) {
   
   // 한개 선택 핸들러
   function onOneckeckHandler(event) {
-    if(checkedArray[event.target.id].checked == false ) {
+    if(checkedArray[event.target.id].checked === false ) {
         checkedArray[event.target.id].checked = true;
         setCheckedArray({...checkedArray,[[event.target.id].checked] : true})
     }
@@ -454,9 +443,9 @@ export default function Business(props) {
         label="옵션"
         > {rows[0] ?
           Object.keys(rows[0]).map((option) => {
-            if(option != "id" && option != "check") {
+            if(option !== "id" && option !== "check") {
               for(var i = 0; i < headCells.length; i++) { // headCells에 있는 한글로 바꿔줌
-                if(headCells[i].id == option) {
+                if(headCells[i].id === option) {
                   return (<MenuItem value={headCells[i].label}>{headCells[i].label}</MenuItem>)
                 }
               }
@@ -480,12 +469,12 @@ export default function Business(props) {
     
     let searchCode = ""; // 검색할 코드가 들어갈 곳
     
-    if(searchOption == "") { // 검색 옵션이 없을 때 
+    if(searchOption === "") { // 검색 옵션이 없을 때 
        return alert('옵션을 지정해주세요.') 
     }
     else {  // 있을 경우 검색 옵션을 코드로 바꿔줌
       for (var i = 0; i < headCells.length; i ++) {
-        if(headCells[i].label == searchOption) {
+        if(headCells[i].label === searchOption) {
           searchCode = headCells[i].id
         }
       }
@@ -494,11 +483,11 @@ export default function Business(props) {
     let emptyArray = []; // 새로 생길 listall을 담아줄 빈배열
     
     for (var i = 0; i < listArrayall.array.length; i ++) {
-      if(listArrayall.array[i][searchCode].indexOf(searchText) != -1) {
+      if(listArrayall.array[i][searchCode].indexOf(searchText) !== -1) {
         emptyArray.push(listArrayall.array[i])
       }
     }
-    if(emptyArray.length == 0) { //검색한 내용이 없을 떄 
+    if(emptyArray.length === 0) { //검색한 내용이 없을 떄 
       return alert('검색한 내용이 없습니다.')
     } 
     
@@ -516,7 +505,7 @@ export default function Business(props) {
       
       let emptyArray = listArrayall.array;
       
-      if(order == 'asc') {
+      if(order === 'asc') {
         emptyArray.sort(function(a, b) {
           const upperCaseA = a[orderBy];
           const upperCaseB = b[orderBy]
