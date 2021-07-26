@@ -1,17 +1,6 @@
-import React, { useState, useEffect  } from 'react';
-import Avatar from '@material-ui/core/Avatar';
-import Button from '@material-ui/core/Button';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
-import Link from '@material-ui/core/Link';
-import Grid from '@material-ui/core/Grid';
-import Box from '@material-ui/core/Box';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
-import Typography from '@material-ui/core/Typography';
+import React, { useState } from 'react';
+import { Button, CssBaseline, TextField, Link, Grid, Container, Popper, Grow, Paper, ClickAwayListener, MenuList, MenuItem } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import Container from '@material-ui/core/Container';
 
 //리덕스
 import {useDispatch} from 'react-redux';
@@ -22,37 +11,67 @@ import { useCookies } from "react-cookie";
 
 import { useHistory } from "react-router-dom";
 
-function Copyright() {
-  return (
-    <Typography variant="body2" color="textSecondary" align="center">
-      {'Copyright © '}
-      <Link color="inherit" href="https://material-ui.com/">
-        Your Website
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
-
 const useStyles = makeStyles((theme) => ({
   paper: {
-    marginTop: theme.spacing(8),
     display: 'flex',
+    width: '100%',
+    height: '100vh',
     flexDirection: 'column',
+    justifyContent: 'center',
     alignItems: 'center',
   },
-  avatar: {
+  logo: {
     margin: theme.spacing(1),
-    backgroundColor: theme.palette.secondary.main,
+    display: 'flex',
+    justifyContent: 'center',
   },
   form: {
     width: '100%', // Fix IE 11 issue.
     marginTop: theme.spacing(1),
   },
+  basic: {
+    margin: theme.spacing(3, 3, 3)
+  },
   submit: {
     margin: theme.spacing(3, 0, 2),
+    padding: theme.spacing(1.5, 0, 1.5),
+    backgroundColor: '#d32f2f',
+    color: 'white',
+    
+    '&:hover': {
+        backgroundColor: '#b52626',
+        color: '#f5f5f5'
+    }
   },
+  hr: {
+    margin: theme.spacing(3, 0, 3)
+  },
+  // textfield focus label style
+  floatingLabelFocusStyle: {
+    '&$focused': {
+        color: '#d32f2f'
+    }
+  },
+  // textfield focus box style
+  fieldFocusStyle: {
+    '&$focused $notchedOutline': {
+        borderColor: '#d32f2f'
+    }
+  },
+  focused: {},
+  notchedOutline: {},
+  // custom checkbox style
+  customCheckboxStyle: {
+    '&$checked': {
+      color: '#d32f2f',
+    },
+  },
+  checked: {},
+  // custom dropdown style
+  customDropdown: {
+    padding: theme.spacing(0, 4),
+    textAlign: 'center'
+  }
 }));
 
 export default function SignIn() {
@@ -62,11 +81,34 @@ export default function SignIn() {
   
   const [cookies, setCookie, removeCookie] = useCookies(['isLogined']);
   
+  //드롭다운 컨트롤
+  const [open, setOpen] = React.useState(false);
+  const anchorRef = React.useRef(null);
+
+  const handleToggle = () => {
+    setOpen((prevOpen) => !prevOpen);
+  };
+
+  const handleClose = (event) => {
+    if (anchorRef.current && anchorRef.current.contains(event.target)) {
+      return;
+    }
+
+    setOpen(false);
+  };
+
+  function handleListKeyDown(event) {
+    if (event.key == 'Tab') {
+      event.preventDefault();
+      setOpen(false);
+    }
+  }
+  
   let loginbody = {
     CNU : "",
     EID : "",
     EPW : "",
-  }
+  };
   
   
   let [loginUser, setLoginUser] = useState(loginbody);
@@ -74,15 +116,14 @@ export default function SignIn() {
   let { CNU, EID, EPW} = loginUser; 
   
   const onDataHandler = (event) => {
-    setLoginUser({...loginUser, [event.target.name] : event.target.value})
-  }
+    setLoginUser({...loginUser, [event.target.name] : event.target.value});
+  };
   
   const onLoginHandler = (event) => {
     event.preventDefault();
     
     dispatch(signinUser(loginUser))
     .then(response => {
-      console.log(response.payload)
       if(response.payload.result == true) {
         setCookie('isLogined',response.payload.isLogined,{path: '/', expires: new Date(Date.now()+86400000)});
         alert('로그인 성공!');
@@ -91,8 +132,8 @@ export default function SignIn() {
       else {
         alert('로그인 실패!');
       }
-    })
-  }
+    });
+  };
   
   
 
@@ -100,12 +141,9 @@ export default function SignIn() {
     <Container component="main" maxWidth="xs">
       <CssBaseline />
       <div className={classes.paper}>
-        <Avatar className={classes.avatar}>
-          <LockOutlinedIcon />
-        </Avatar>
-        <Typography component="h1" variant="h5">
-          Sign in
-        </Typography>
+        <div className={classes.logo}>
+          <img src="../../../../images/mk_logo4.png" />
+        </div>
         <form className={classes.form} onSubmit = {onLoginHandler} >
         <TextField
             variant="outlined"
@@ -117,6 +155,19 @@ export default function SignIn() {
             name="CNU"
             autoComplete="CNU"
             autoFocus
+            InputLabelProps={{
+                classes: {
+                    root: classes.floatingLabelFocusStyle,
+                    focused: classes.focused
+                }
+            }}
+            InputProps={{
+              classes: {
+                root: classes.fieldFocusStyle,
+                focused: classes.focused,
+                notchedOutline: classes.notchedOutline
+              },
+            }}
             value={CNU}
             onChange={onDataHandler}
           />
@@ -129,7 +180,19 @@ export default function SignIn() {
             label="아이디"
             name="EID"
             autoComplete="EID"
-            autoFocus
+            InputLabelProps={{
+                classes: {
+                    root: classes.floatingLabelFocusStyle,
+                    focused: classes.focused
+                }
+            }}
+            InputProps={{
+              classes: {
+                root: classes.fieldFocusStyle,
+                focused: classes.focused,
+                notchedOutline: classes.notchedOutline
+              },
+            }}
             value={EID}
             onChange={onDataHandler}
           />
@@ -143,6 +206,19 @@ export default function SignIn() {
             type="password"
             id="EPW"
             autoComplete="current-password"
+            InputLabelProps={{
+                classes: {
+                    root: classes.floatingLabelFocusStyle,
+                    focused: classes.focused
+                }
+            }}
+            InputProps={{
+              classes: {
+                root: classes.fieldFocusStyle,
+                focused: classes.focused,
+                notchedOutline: classes.notchedOutline
+              },
+            }}
             value={EPW}
             onChange={onDataHandler}
           />
@@ -153,25 +229,55 @@ export default function SignIn() {
             color="primary"
             className={classes.submit}
           >
-            Sign In
+            로그인
           </Button>
           <Grid container>
             <Grid item xs>
-              <Link href="#" variant="body2">
-                Forgot password?
+              <Link href="#" variant="body2" color="textSecondary">
+                비밀번호를 잊으셨나요?
               </Link>
             </Grid>
             <Grid item>
-              <Link href="/signupconfirm" variant="body2">
-                {"Don't have an account? Sign Up"}
+              <Link
+                style={{cursor: 'pointer'}}
+                ref={anchorRef}
+                variant="body2"
+                color="textSecondary"
+                aria-controls={open ? 'menu-list-grow' : undefined}
+                aria-haspopup="true"
+                onClick={handleToggle}
+              >
+                회원가입 페이지로 이동
               </Link>
+              <Popper open={open} anchorEl={anchorRef.current} role={undefined} transition disablePortal>
+                {({ TransitionProps, placement }) => (
+                  <Grow
+                    {...TransitionProps}
+                    style={{ transformOrigin: placement == 'bottom' ? 'center top' : 'center bottom' }}
+                  >
+                    <Paper>
+                      <ClickAwayListener onClickAway={handleClose}>
+                        <MenuList autoFocusItem={open} id="menu-list-grow" onKeyDown={handleListKeyDown}>
+                          <MenuItem onClick={handleClose}>
+                            <Link href="/signupconfirm?kind=company" variant="body2" color="textSecondary" className={classes.customDropdown}>
+                              {"사업주"}
+                            </Link>
+                          </MenuItem>
+                          <MenuItem onClick={handleClose}>
+                            <Link href="/signupconfirm?kind=employee" variant="body2" color="textSecondary" className={classes.customDropdown}>
+                              {"직원"}
+                            </Link>
+                          </MenuItem>
+                        </MenuList>
+                      </ClickAwayListener>
+                    </Paper>
+                  </Grow>
+                )}
+              </Popper>
             </Grid>
           </Grid>
         </form>
       </div>
-      <Box mt={8}>
-        <Copyright />
-      </Box>
     </Container>
   );
 }

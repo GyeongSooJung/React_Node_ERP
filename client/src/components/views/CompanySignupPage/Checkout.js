@@ -61,8 +61,8 @@ const useStyles = makeStyles((theme) => ({
     color: 'white',
     
     '&:hover': {
-        backgroundColor: '#b52626',
-        color: '#f5f5f5'
+      backgroundColor: '#b52626',
+      color: '#f5f5f5'
     }
   },
   hr: {
@@ -85,57 +85,108 @@ const useStyles = makeStyles((theme) => ({
 
 
 
-export default function Checkout() {
-  const steps = ['계정 정보', '사업자 정보', '개인 정보'];
+export default function Checkout(props) {
+  let steps = [];
   const classes = useStyles();
+  const urlQuery = props.location.search.split("kind=")[1];
+  
+  if(urlQuery == 'company') {
+    steps = ['계정 정보', '사업자 정보', '개인 정보'];
+  }
+  else {
+    steps = ['계정 정보', '개인 정보'];
+  }
 
   function getStepContent(step) {
-    switch (step) {
-      case 0:
-        return <Account formParent={{user : user, activeStep : activeStep}}
-        onChange={value => {
-          setUser(value.user);
-          setActiveStep(value.activeStep);
-        }}/>;
-      case 1:
-        return <Company formParent={{user : user, activeStep : activeStep}} 
-        onChange={value => {
-          setUser(value.user);
-          setActiveStep(value.activeStep);
-        }}/>;
-      case 2:
-        return <Personal formParent={{user : user, activeStep : activeStep, signupResult : signupResult}} 
-        onChange={value => {
-          setUser(value.user);
-          setActiveStep(value.activeStep);
-          setSignupResult(value.signupResult);
-        }}/>;
-      default:
-        throw new Error('Unknown step');
+    if(urlQuery == 'company') {
+      switch (step) {
+        case 0:
+          return <Account formParent={{user : user, activeStep : activeStep, urlQuery : urlQuery}}
+          onChange={value => {
+            setUser(value.user);
+            setActiveStep(value.activeStep);
+          }}/>;
+        case 1:
+          return <Company formParent={{user : user, activeStep : activeStep, urlQuery : urlQuery}} 
+          onChange={value => {
+            setUser(value.user);
+            setActiveStep(value.activeStep);
+          }}/>;
+        case 2:
+          return <Personal formParent={{user : user, activeStep : activeStep, urlQuery : urlQuery}} 
+          onChange={value => {
+            setUser(value.user);
+            setActiveStep(value.activeStep);
+            setSignupResult(value.signupResult);
+          }}/>;
+        default:
+          throw new Error('Unknown step');
+      }
+    }
+    else {
+      switch (step) {
+        case 0:
+          return <Account formParent={{user : user, activeStep : activeStep, urlQuery : urlQuery}}
+          onChange={value => {
+            setUser(value.user);
+            setActiveStep(value.activeStep);
+          }}/>;
+        case 1:
+          return <Personal formParent={{user : user, activeStep : activeStep, urlQuery : urlQuery}} 
+          onChange={value => {
+            setUser(value.user);
+            setActiveStep(value.activeStep);
+            setSignupResult(value.signupResult);
+          }}/>;
+        default:
+          throw new Error('Unknown step');
+      }
     }
   }
   
-  let userbody = { // 유저에 관한 내용들 
-      EID : "",
-      EPW : "",
-      ENA : "",
-      EAD : "",
-      EAD2 : "",
-      EPH : "",
-      EEM : "",
-      PWC : "",
-      CNA : "",
-      CNU : "",
-      CAD : "",
-      CAD2 : "",
-      CEON : "",
-      CEOP : "",
-      CTEL : "",
-      CFAX : "",
-      CEM : "",
-      IDcheck : false,
-      CNUcheck : "",
-      authNum : "",
+  let userbody = {};
+  
+  if(urlQuery == 'company') {
+    userbody = { // 사업자 가입 시 DB에 저장될 데이터 
+        EID : "",
+        EPW : "",
+        ENA : "",
+        EAD : "",
+        EAD2 : "",
+        EPH : "",
+        EEM : "",
+        EAU : "1",
+        PWC : "",
+        CNA : "",
+        CNU : "",
+        CAD : "",
+        CAD2 : "",
+        CEON : "",
+        CEOP : "",
+        CTEL : "",
+        CFAX : "",
+        CEM : "",
+        IDcheck : false,
+        CNUcheck : false,
+        authNum : "",
+    };
+  }
+  else {
+    userbody = { // 직원 가입 시 DB에 저장될 데이터 
+        EID : "",
+        EPW : "",
+        ENA : "",
+        EAD : "",
+        EAD2 : "",
+        EPH : "",
+        EEM : "",
+        EAU : "2",
+        PWC : "",
+        CNU: "",
+        IDcheck : false,
+        CNUfind: false,
+        authNum : "",
+    };
   }
 
   const [user, setUser] = useState(userbody);
@@ -166,7 +217,7 @@ export default function Checkout() {
               ))}
             </Stepper>
             <React.Fragment>
-              {activeStep === steps.length ?
+              {activeStep == steps.length ?
                 signupResult ?
                   <div>
                     <Typography variant="h5" gutterBottom>

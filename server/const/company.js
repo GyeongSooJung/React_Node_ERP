@@ -7,6 +7,8 @@ const COMPANY = {
     CTEL : "CTEL",
     CFAX : "CFAX",
     CEM : "CEM",
+    CTY : "CTY",
+    CTO : "CTO",
     CCA : "CCA",
     CUA : "CUA",
     schema : {
@@ -35,6 +37,12 @@ const COMPANY = {
         },//Company email
         CEM : {
             type : String,
+        },//Company type
+        CTY : {
+            type : String
+        },//Company TOB
+        CTO : {
+            type : String
         },//Comapny Create at
         CCA : {
             type : Date,

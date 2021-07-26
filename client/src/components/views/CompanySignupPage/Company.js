@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { Typography, Grid, TextField, Button } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
+//다른 파일
+import { CHECK, VALIDATION } from '../../utils/validation';
+
 //리덕스
 import {useDispatch} from 'react-redux';
 import {cnuCheck} from '../../../_actions/user_action';
@@ -9,13 +12,14 @@ import {cnuCheck} from '../../../_actions/user_action';
 //주소 검색
 import DaumPostCode from 'react-daum-postcode';
 
-//쿠키 사용
-import { useCookies } from "react-cookie";
-
 const useStyles = makeStyles((theme) => ({
   verticalCenter: {
       display: 'flex',
       alignItems: 'center',
+  },
+  verticalStart: {
+    display: 'flex',
+    alginItems: 'start'
   },
   colorButton: {
     marginTop: theme.spacing(3),
@@ -44,7 +48,7 @@ const useStyles = makeStyles((theme) => ({
     alignItems: 'center'
   },
   formButton: {
-      margin: theme.spacing(1.1, 0, 0, 2),
+      margin: theme.spacing(2, 0, 0, 2),
       padding: theme.spacing(3.5, 2),
       width: '30%',
       height: '1.1876em',
@@ -88,25 +92,28 @@ export default function CompanytForm(props) {
   let [user, setUserState] = useState(userbody);
   let [CNUcheck, setCNUcheck] = useState(userbody.CNUcheck);
   
-  //쿠키 제거하기위한 함수
-  const [cookies, setCookie, removeCookie] = useCookies(['hashAuth']);
-  removeCookie('hashAuth')
-  
   // 주소 확인 여부
   let [AddressOn, setAddressOn] = useState(false);
   
-  let {CNU, CNA, CAD, CAD2, CEON, CEOP, CTEL, CFAX, CEM} = user
+  let {CNU, CNA, CAD, CAD2, CEON, CEOP, CTEL, CFAX, CEM} = user;
   
   const onBeforeHandler = (event) => {
     const data = { user : user, activeStep : activeStep - 1 };
     props.onChange(data);
-  }
+  };
   
   const onNextHandler = (event) => {
     event.preventDefault();
-    user.CNUcheck = CNUcheck;
-    const data = { user : user, activeStep : activeStep + 1 };
-    props.onChange(data);
+    if(!CNUcheck) {
+      alert('사업자 인증을 진행해주세요.');
+    }
+    else if(!VALIDATION(CHECK.NumCheck, CTEL) || !VALIDATION(CHECK.NumCheck, CFAX) || !VALIDATION(CHECK.NumCheck, CEOP)) {
+      return false;
+    }
+    else {
+      const data = { user : user, activeStep : activeStep + 1 };
+      props.onChange(data);
+    }
   }
   
   const onDataHandler = (event) => {
@@ -119,7 +126,7 @@ export default function CompanytForm(props) {
     .then(response => {
             if(response.payload.CRNumber == "complete") {
               alert('유효한 사업자번호입니다.');
-              setCNUcheck(response.payload.CRNumber);
+              setCNUcheck(true);
             }
             else if (response.payload.CRNumber == "duplicated"){
               alert('중복된 사업자 번호가 존재합니다.');
@@ -128,14 +135,14 @@ export default function CompanytForm(props) {
             else {
               alert('유효하지 않은 사업자번호입니다.');
             }
-        })
-  }
+        });
+  };
   
   // 주소 검색 기능
   const handleComplete = (data) => {
         let fullAddress = data.address;
         let extraAddress = '';
-        if (data.addressType === 'R') {
+        if (data.addressType == 'R') {
             if (data.bname !== '') {
                 extraAddress += data.bname;
             }
@@ -148,16 +155,11 @@ export default function CompanytForm(props) {
         user.CAD = fullAddress;
         setUserState(user);
         setAddressOn(false);
-    }
+    };
     
   const Addresspop = () => {
     setAddressOn(true);
-  }
-  
-  const numValidation = (input) => {
-    let check = /[^-0-9]/g;
-    return check.test(input);
-  }
+  };
 
   return (
     <React.Fragment>
@@ -166,7 +168,7 @@ export default function CompanytForm(props) {
       </Typography>
       <form onSubmit={onNextHandler}>
         <Grid container>
-          <Grid item xs={12} className={classes.verticalCenter}>
+          <Grid item xs={12} className={classes.verticalStart}>
             <TextField
               variant="outlined"
               margin="normal"
@@ -231,7 +233,7 @@ export default function CompanytForm(props) {
               onChange={onDataHandler}
             />
           </Grid>
-          <Grid item xs={12} className={classes.verticalCenter}>
+          <Grid item xs={12} className={classes.verticalStart}>
             <TextField
               variant="outlined"
               margin="normal"
@@ -295,8 +297,8 @@ export default function CompanytForm(props) {
           </Grid>
           <Grid item xs={12}>
             <TextField
-              error={numValidation(CTEL)}
-              helperText={(CTEL.length != 0) && numValidation(CTEL) ? "숫자만 입력해주세요." : ""}
+              error={(CTEL.length != 0) && !VALIDATION(CHECK.NumCheck, CTEL)}
+              helperText={(CTEL.length != 0) && !VALIDATION(CHECK.NumCheck, CTEL) ? "숫자만 입력해주세요." : ""}
               variant="outlined"
               margin="normal"
               required
@@ -324,8 +326,8 @@ export default function CompanytForm(props) {
           </Grid>
           <Grid item xs={12}>
             <TextField
-              error={numValidation(CFAX)}
-              helperText={(CFAX.length != 0) && numValidation(CFAX) ? "숫자만 입력해주세요." : ""}
+              error={(CFAX.length != 0) && !VALIDATION(CHECK.NumCheck, CFAX)}
+              helperText={(CFAX.length != 0) && !VALIDATION(CHECK.NumCheck, CFAX) ? "숫자만 입력해주세요." : ""}
               variant="outlined"
               margin="normal"
               required
@@ -407,8 +409,8 @@ export default function CompanytForm(props) {
           </Grid>
           <Grid item xs={12}>
             <TextField
-              error={numValidation(CEOP)}
-              helperText={(CEOP.length != 0) && numValidation(CEOP) ? "숫자만 입력해주세요." : ""}
+              error={(CEOP.length != 0) && !VALIDATION(CHECK.NumCheck, CEOP)}
+              helperText={(CEOP.length != 0) && !VALIDATION(CHECK.NumCheck, CEOP) ? "숫자만 입력해주세요." : ""}
               variant="outlined"
               margin="normal"
               required

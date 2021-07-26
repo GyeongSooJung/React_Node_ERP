@@ -13,33 +13,44 @@ const {COLLECTION_NAME, QUERY} = require('../const/consts');
 
 router.post('/signin', async (req, res, next) => {
   
-  const { CNU, EID, EPW } = req.body;
-  const employeeone = await modelQuery(QUERY.Find,COLLECTION_NAME.Employee, {
-    CNU : CNU,
-    EID : EID
-  },{})
-  
-  
-  if ( bcrypt.compareSync(EPW,employeeone[0].EPW) ) {
-    res.send({result : true, isLogined : employeeone[0]});
-  }
-  else {
+  try {
+    const { CNU, EID, EPW } = req.body;
+    const employeeone = await modelQuery(QUERY.Find,COLLECTION_NAME.Employee, {
+      CNU : CNU,
+      EID : EID
+    },{})
+    
+    
+    if ( bcrypt.compareSync(EPW,employeeone[0].EPW) ) {
+      res.send({result : true, isLogined : employeeone[0]});
+    }
+    else {
+      res.send({result : false});
+    }
+  } catch(err) {
     res.send({result : false});
+    console.error(err);
+    next(err);
   }
 })
 
 router.post('/signup', async (req, res, next) => {
+  const kind = req.query.kind;
+  console.log(kind);
   try {
-    await modelQuery(QUERY.Create,COLLECTION_NAME.Company,{
-      CNA : req.body.CNA,
-      CNU : req.body.CNU,
-      CAD : req.body.CAD + " " +req.body.CAD2,
-      CEON : req.body.CEON,
-      CEOP : req.body.CEOP,
-      CTEL : req.body.CTEL,
-      CFAX : req.body.CFAX,
-      CEM : req.body.CEM
-    },{})
+    // 사업주 가입일때만
+    if(kind == 'company') {
+      await modelQuery(QUERY.Create,COLLECTION_NAME.Company,{
+        CNA : req.body.CNA,
+        CNU : req.body.CNU,
+        CAD : req.body.CAD + " " +req.body.CAD2,
+        CEON : req.body.CEON,
+        CEOP : req.body.CEOP,
+        CTEL : req.body.CTEL,
+        CFAX : req.body.CFAX,
+        CEM : req.body.CEM
+      },{})
+    }
     
     const EPW = req.body.EPW;
     const hashAuth = await bcrypt.hash(EPW, 12);
@@ -51,7 +62,7 @@ router.post('/signup', async (req, res, next) => {
       EAD : req.body.EAD + " " +req.body.EAD2,
       EPH : req.body.EPH,
       EEM : req.body.EEM,
-      EAU : "mk",
+      EAU : req.body.EAU,
       CNU : req.body.CNU
     },{})
     
@@ -122,6 +133,27 @@ router.post('/cnucheck', async (req, res, next) => {
           else resolve(res.map.trtCntn[0]); // trtCntn 이라는 TAG 의 값을 get
         });
     });
+  }
+});
+
+// 사업자등록번호 가입 여부 조회
+router.post('/cnufind', async (req, res, next) => {
+  try {
+    const companys = await modelQuery(QUERY.Find, COLLECTION_NAME.Company,{},{});
+    if(companys == 0) {
+      res.send({result: false});
+    }
+    else {
+      let companylist = [];
+      for(var i = 0; i < companys.length; i++) {
+        companylist[i] = {"CNA" : companys[i].CNA, "CNU" : companys[i].CNU, "CEON" : companys[i].CEON};
+      }
+      console.log(companylist);
+      res.send({result: true, companylist: companylist});
+    }
+  } catch(err) {
+    console.error(err);
+    next(err);
   }
 });
 

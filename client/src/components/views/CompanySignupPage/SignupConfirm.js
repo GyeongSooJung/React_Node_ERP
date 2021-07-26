@@ -1,7 +1,8 @@
+// react, material-ui import
 import React, { useState, useEffect  } from 'react';
-import { Button, CssBaseline, FormControlLabel, Checkbox, Link, Grid, Box, Typography, Container } from '@material-ui/core';
+import { Button, CssBaseline, FormControlLabel, Checkbox, Link, Grid, Typography, Container } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-
+// react-router
 import { useHistory } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
@@ -43,11 +44,23 @@ const useStyles = makeStyles((theme) => ({
       color: '#d32f2f',
     },
   },
-  checked: {}
+  checked: {},
+  flexStart: {
+    display: 'flex',
+    justifyContent: 'flex-start',
+    alignItems: 'center'
+  },
+  borderBox: {
+    height: '130px',
+    border: '1px solid grey',
+    padding: theme.spacing(2),
+    overflowY: 'scroll'
+  }
 }));
 
 
 export default function SignUpConfirm(props) {
+    const urlQuery = props.location.search.split("?")[1];
     const classes = useStyles();
     const history = useHistory();
     
@@ -55,38 +68,57 @@ export default function SignUpConfirm(props) {
         all : false,
         one: false,
         two: false,
-    }
+    };
     
-    let [state, setState] = useState(checkinit);
-    let { all, one, two } = state;
+    const [state, setState] = useState(checkinit);
+    const { all, one, two } = state;
     
     const handleChange = (event) => {
-        setState({...state, [event.target.name] : event.target.checked})
-    }
+      if(event.target.name == "all") {
+        setState({
+          one : event.target.checked,
+          two : event.target.checked
+        });
+      }
+      else {
+        setState({...state, [event.target.name] : event.target.checked});
+      }
+    };
     
-    useEffect(()=> {
-        if(state.all == true) {
-            
-            setState({
-                all : true,
-                one: true,
-                two: true,
-            });
-        }
-        else {
-            // setState({all : false, one : false, two : false});
-            
-            setState({
-                all : false,
-                one: false,
-                two: false,
-            });
-        }
-    }, [state.all])
+    useEffect(() => {
+      if(state.one == true && state.two == true) {
+        setState({
+          all : true,
+          one: true,
+          two: true
+        });
+      }
+      else if(state.one == true && state.two == false) {
+        setState({
+          all : false,
+          one: true,
+          two: false
+        });
+      }
+      else if(state.one == false && state.two == true) {
+        setState({
+          all : false,
+          one: false,
+          two: true
+        });
+      }
+      else if(state.one == false && state.two == false) {
+        setState({
+          all : false,
+          one: false,
+          two: false,
+        });
+      }
+    }, [state.one, state.two]);
     
     const gotosignup = () => {
-        history.push('/signup');
-    }
+        history.push('/signup?'+urlQuery);
+    };
     
     
 
@@ -102,30 +134,76 @@ export default function SignUpConfirm(props) {
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <FormControlLabel
-                control={<Checkbox checked={all} onChange={handleChange} name="all" value="allowExtraEmails" classes={{
+                control={
+                  <Checkbox
+                    checked={all}
+                    onChange={handleChange}
+                    name="all"
+                    value="allowExtraEmails"
+                    classes={{
                         root: classes.customCheckboxStyle,
                         checked: classes.checked
-                }} />}
-                label="이용약관, 개인정보 수집 및 이용에 모두 동의합니다."
+                    }}
+                  />
+                }
+                style={{textDecorationLine: 'underline'}}
+                label={<span style={{ fontWeight: 'bold' }}>"이용약관, 개인정보 수집 및 이용에 모두 동의합니다."</span>}
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid item xs={12} className={classes.flexStart}>
               <FormControlLabel
-                control={<Checkbox checked={one} onChange={handleChange} name="all" value="allowExtraEmails" classes={{
-                        root: classes.customCheckboxStyle,
-                        checked: classes.checked
-                }} />}
-                label="--- 이용약관 동의"
+                control={
+                  <Checkbox
+                    required
+                    checked={one}
+                    onChange={handleChange}
+                    name="one"
+                    value="allowExtraEmails"
+                    classes={{
+                          root: classes.customCheckboxStyle,
+                          checked: classes.checked
+                    }}
+                  />
+                }
+                style={{marginRight: '5px'}}
+                label="이용약관 동의"
               />
+              <Typography variant="subtitle2" color="error">(필수)</Typography>
             </Grid>
-            <Grid item xs={12}>
+            <Grid item xs={12} container wrap="nowrap" style={{marginTop: "-15px"}}>
+              <Grid item xs zeroMinWidth>
+                <Typography className={classes.borderBox}>
+                
+                </Typography>
+              </Grid>
+            </Grid>
+            <Grid item xs={12} className={classes.flexStart}>
               <FormControlLabel
-                control={<Checkbox checked={two} onChange={handleChange} name="all" value="allowExtraEmails" classes={{
+                mr={0}
+                control={
+                  <Checkbox
+                    required
+                    checked={two}
+                    onChange={handleChange}
+                    name="two"
+                    value="allowExtraEmails"
+                    classes={{
                         root: classes.customCheckboxStyle,
                         checked: classes.checked
-                }} />}
+                    }} 
+                  />
+                }
+                style={{marginRight: '5px'}}
                 label="개인정보 수집 및 이용 동의"
               />
+              <Typography variant="subtitle2" color="error">(필수)</Typography>
+            </Grid>
+            <Grid item xs={12} container wrap="nowrap" style={{marginTop: "-15px"}}>
+              <Grid item xs zeroMinWidth>
+                <Typography className={classes.borderBox}>
+                
+                </Typography>
+              </Grid>
             </Grid>
           </Grid>
           <Button

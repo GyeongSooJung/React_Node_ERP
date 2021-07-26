@@ -3,6 +3,7 @@ import {
     SIGNUP_COMPANY,
     ID_CHECK,
     CNU_CHECK,
+    CNU_FIND,
     EMAIL_SEND,
     SIGNIN_USER
 } from '../_actions/types';
@@ -22,6 +23,9 @@ export default function (state = {}, action) {
             return { ...state, data : action.payload }
             break;
         case CNU_CHECK :
+            return { ...state, data : action.payload }
+            break;
+        case CNU_FIND : 
             return { ...state, data : action.payload }
             break;
         default :

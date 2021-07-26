@@ -2,6 +2,9 @@ import React, { useState, useEffect} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { Typography, Grid, TextField, Button, Link, Box } from '@material-ui/core';
 
+//다른 파일
+import { CHECK, VALIDATION } from '../../utils/validation';
+
 //리덕스
 import {useDispatch} from 'react-redux';
 import {emailSend, emailCert} from '../../../_actions/email_action';
@@ -22,6 +25,10 @@ const useStyles = makeStyles((theme) => ({
   verticalCenter: {
       display: 'flex',
       alignItems: 'center',
+  },
+  verticalStart: {
+    display: 'flex',
+    alginItems: 'start'
   },
   colorButton: {
     marginTop: theme.spacing(3),
@@ -52,7 +59,7 @@ const useStyles = makeStyles((theme) => ({
     alignItems: 'center'
   },
   formButton: {
-      margin: theme.spacing(1.1, 0, 0, 2),
+      margin: theme.spacing(2, 0, 0, 2),
       padding: theme.spacing(3.5, 2),
       width: '30%',
       height: '1.1876em',
@@ -88,6 +95,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Review(props) {
 
+  const kind = props.formParent.urlQuery; // 상위에서 받아온 urlQuery
   const classes = useStyles();
   const dispatch = useDispatch();
   const history = useHistory();
@@ -97,7 +105,6 @@ export default function Review(props) {
   
   let userbody = props.formParent.user;
   let activeStep = props.formParent.activeStep;
-  let signupResult = props.formParent.signupResult;
   
   let [user, setUserState] = useState(userbody);
   let [emailcertCheck, setEmailCertCheck] = useState(false);
@@ -115,24 +122,19 @@ export default function Review(props) {
   
   const onBeforeHandler = (event) => {
     const data = { user : user, activeStep : activeStep - 1 };
+    removeCookie('hashAuth');
     props.onChange(data);
-  }
-  
-  const onNextHandler = (event) => {
-    event.preventDefault();
-    const data = { user : user, activeStep : activeStep + 1 };
-    props.onChange(data);
-  }
+  };
   
   const onDataHandler = (event) => {
-    setUserState({...user, [event.target.name] : event.target.value})
-  }
+    setUserState({...user, [event.target.name] : event.target.value});
+  };
   
     // 주소 검색 기능
   const handleComplete = (data) => {
     let fullAddress = data.address;
     let extraAddress = '';
-    if (data.addressType === 'R') {
+    if (data.addressType == 'R') {
         if (data.bname !== '') {
             extraAddress += data.bname;
         }
@@ -145,19 +147,20 @@ export default function Review(props) {
     user.EAD = fullAddress;
     setUserState(user);
     setAddressOn(false);
-  }
+  };
     
   const Addresspop = () => {
     setAddressOn(true);
-  }
+  };
+  
   const emailsendHandler = async () => {
     if(EEM.length != 0) {
       dispatch(emailSend(user))
       .then(response => {
         if(response.payload.result == 'send') {
           setEmailSendCheck(true);
-          setMinutes(0);
-          setSeconds(5);
+          setMinutes(5);
+          setSeconds(0);
           const hashAuth = response.payload.hashAuth;
           setCookie('hashAuth',hashAuth,{path: '/', expires: new Date(Date.now()+300000)});
           
@@ -175,7 +178,7 @@ export default function Review(props) {
     else {
       alert('이메일을 입력해주세요.');
     }
-  }
+  };
   
   const emailcertHandler = (event) => {
     if(authNum.length != 0 ) {
@@ -189,20 +192,23 @@ export default function Review(props) {
           else {
             alert('인증번호를 다시 입력해주세요.');
           }
-        })
+        });
     }
     else {
       alert('인증번호를 입력해주세요.');
     }
-  }
+  };
   
   const onSignupHandler = (event) => {
     event.preventDefault();
     if(!emailcertCheck) {
       alert('이메일 인증을 받아주세요.');
     }
+    else if(!VALIDATION(CHECK.NumCheck, EPH)) {
+      return false;
+    }
     else {
-        dispatch(signupCompany(user))
+        dispatch(signupCompany(user, kind))
         .then(response => {
           if(response.payload.result == true) {
             let data = { user : user, activeStep : activeStep + 1, signupResult : true };
@@ -218,20 +224,12 @@ export default function Review(props) {
     }
   }
   
-  const numValidation = (input) => {
-    let check = /[^-0-9]/g;
-    return check.test(input);
-  }
-  
   useEffect(() => {
-    console.log(cookies.hashAuth);
     if(!cookies.hashAuth){
       setCookieBool(false);
-      console.log('bye');
     }
     else {
       setCookieBool(true);
-      console.log('hi');
     }
   },[cookies.hashAuth]);
   
@@ -240,8 +238,8 @@ export default function Review(props) {
       if (parseInt(seconds) > 0) {
         setSeconds(parseInt(seconds) - 1);
       }
-      if (parseInt(seconds) === 0) {
-        if (parseInt(minutes) === 0) {
+      if (parseInt(seconds) == 0) {
+        if (parseInt(minutes) == 0) {
           if(!emailcertCheck && CookieBool) {
             clearInterval(countdown);
             setEmailSendCheck(false);
@@ -296,7 +294,7 @@ export default function Review(props) {
             />
           </Grid>
           
-          <Grid item xs={12} className={classes.verticalCenter}>
+          <Grid item xs={12} className={classes.verticalStart}>
             <TextField
               variant="outlined"
               margin="normal"
@@ -360,8 +358,8 @@ export default function Review(props) {
           </Grid>
           <Grid item xs={12}>
             <TextField
-              error={numValidation(EPH)}
-              helperText={(EPH.length != 0) && numValidation(EPH) ? "숫자만 입력해주세요." : ""}
+              error={(EPH.length != 0) && !VALIDATION(CHECK.NumCheck, EPH)}
+              helperText={(EPH.length != 0) && !VALIDATION(CHECK.NumCheck, EPH) ? "숫자만 입력해주세요." : ""}
               variant="outlined"
               margin="normal"
               required
@@ -448,7 +446,7 @@ export default function Review(props) {
               null
               }
             </Grid>
-            <Grid item xs={12} className={classes.verticalCenter}>
+            <Grid item xs={12} className={classes.verticalStart}>
               <TextField
                 variant="outlined"
                 margin="normal"
@@ -489,7 +487,7 @@ export default function Review(props) {
           </Grid>
           : 
           <Grid container>
-            <Grid item xs={12} className={classes.verticalCenter}>
+            <Grid item xs={12} className={classes.verticalStart}>
               <TextField
                 variant="outlined"
                 margin="normal"

@@ -4,6 +4,7 @@ import {
     SIGNUP_COMPANY,
     ID_CHECK,
     CNU_CHECK,
+    CNU_FIND,
     EMAIL_SEND,
     SIGNIN_USER
 } from './types';
@@ -28,8 +29,8 @@ export function signinUser(dataTosubmit) {
     }
 }
 
-export function signupCompany(dataToSubmit) {
-    const request = Axios.post('/auth/signup',dataToSubmit)
+export function signupCompany(dataToSubmit, urlQuery) {
+    const request = Axios.post('/auth/signup?kind='+urlQuery,dataToSubmit)
     .then(response =>  response.data);
     return {
         type : SIGNUP_COMPANY,
@@ -51,7 +52,16 @@ export function cnuCheck(dataToSubmit) {
     const request = Axios.post('/auth/cnucheck',dataToSubmit)
     .then(response =>  response.data);
     return {
-        type : ID_CHECK,
+        type : CNU_CHECK,
+        payload: request
+    }
+}
+
+export function cnuFind(dataToSubmit) {
+    const request = Axios.post('/auth/cnufind', dataToSubmit)
+    .then(response => response.data);
+    return {
+        type : CNU_FIND,
         payload: request
     }
 }
