@@ -1,4 +1,4 @@
-const COMPANY = {
+const CUSTOMER = {
     CNA : "CNA",
     CNU : "CNU",
     CAD : "CAD",
@@ -9,6 +9,8 @@ const COMPANY = {
     CEM : "CEM",
     CTY : "CTY",
     CTO : "CTO",
+    CAN : "CAN",
+    CME : "CME",
     CCA : "CCA",
     CUA : "CUA",
     schema : {
@@ -43,6 +45,13 @@ const COMPANY = {
         },//Company TOB
         CTO : {
             type : String
+        },//Company Account Number
+        CAN : {
+            type : String
+        },//Comapny Memo
+        CME : {
+            type : Date,
+            default : Date.now
         },//Comapny Create at
         CCA : {
             type : Date,
@@ -55,4 +64,4 @@ const COMPANY = {
     }
 }
 
-exports.COMPANY = COMPANY;
+exports.CUSTOMER = CUSTOMER;
