@@ -179,7 +179,6 @@ export default function Dashboard() {
       default :
         return <Deposits />;
     }
-    
   }
   
   const onMenulistHandler = (event) => {

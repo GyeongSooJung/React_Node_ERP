@@ -201,7 +201,9 @@ export default function Checkout(props) {
         <div className={classes.paper}>
           <div className={classes.form}>
             <div className={classes.logo}>
-              <img src="../../../../images/mk_logo4.png" />
+              <Link href="/signin" underline='none'>
+                <img src="../../../../images/mk_logo4.png" />
+              </Link>
             </div>
             <Stepper activeStep={activeStep} className={classes.stepper}>
               {steps.map((label) => (

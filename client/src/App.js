@@ -22,6 +22,7 @@ import SigninPage from './components/views/SigninPage/SigninPage';
 import SignupConfirm from './components/views/CompanySignupPage/SignupConfirm';
 import SignupPage from './components/views/CompanySignupPage/Checkout';
 import SignupAddress from './components/views/CompanySignupPage/Address';
+import FindAccountPage from './components/views/FindAccountPage/FindAccountPage';
 import DashboardPage from './components/views/DashboardPage/Dashboard';
 import listtestPage from './components/views/DashboardPage/Menu/listTest';
 
@@ -42,6 +43,7 @@ export default function BasicExample() {
           <Route exact path="/signup" component={SignupPage} />
           <Route exact path="/signupconfirm" component={SignupConfirm} />
           <Route exact path="/address" component={SignupAddress} />
+          <Route exact path="/findaccount" component={FindAccountPage} />
           <Route exact path="/dashboard" component={DashboardPage} />
           <Route exact path="/listtest" component={listtestPage} />
           

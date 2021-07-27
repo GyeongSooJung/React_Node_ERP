@@ -142,7 +142,9 @@ export default function SignIn() {
       <CssBaseline />
       <div className={classes.paper}>
         <div className={classes.logo}>
-          <img src="../../../../images/mk_logo4.png" />
+          <Link href="/signin" underline='none'>
+            <img src="../../../../images/mk_logo4.png" />
+          </Link>
         </div>
         <form className={classes.form} onSubmit = {onLoginHandler} >
         <TextField
@@ -233,8 +235,12 @@ export default function SignIn() {
           </Button>
           <Grid container>
             <Grid item xs>
-              <Link href="#" variant="body2" color="textSecondary">
-                비밀번호를 잊으셨나요?
+              <Link href="/findaccount" variant="body2" color="textSecondary">
+                아이디
+              </Link>
+              <span variant="body2" color="textSecondary"> / </span>
+              <Link href="/findaccount" variant="body2" color="textSecondary">
+                비밀번호 찾기
               </Link>
             </Grid>
             <Grid item>

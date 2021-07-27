@@ -294,7 +294,7 @@ export default function Business(props) {
     dispatch(createData(companyBody))
     .then(response => {
       if(response.payload.result === true) {
-            // 서버에서 받아온 데이터를 이용해 rows에서 해당 내용 제거
+            // 서버에서 받아온 데이터를 이용해 rows에서 해당 내용 추
             
             // 제거한 후 listAll 바꿔줌(바뀐 rows로)
             alert("등록이 완료되었습니다..");
@@ -366,7 +366,7 @@ export default function Business(props) {
   },[listArrayall])
   
   useEffect(()=>{ // checkedArray 바꿀 때마다 undefined 생겨서 지워줌
-    delete checkedArray[undefined];
+    delete checkedArray[undefined]; 
   },[checkedArray])
   
   useEffect(()=> { //페이지가 바뀔 때마다 설정값 바꿔줌
@@ -525,6 +525,7 @@ export default function Business(props) {
           if(upperCaseA === upperCaseB) return 0;
         })
       }
+      
       setListArrayall({array : emptyArray});
   };
   
